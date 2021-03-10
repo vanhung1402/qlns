@@ -1,0 +1,42 @@
+# server
+/jwt-authenticate/node_modules
+
+# server
+/authenticate-server/node_modules
+
+# api-server
+/api-server/node_modules
+/api-server/logfile
+
+# frontend
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Dependencies
+/tuyendung/node_modules/
+
+# Dev/Build Artifacts
+/tuyendung/dist/
+/tuyendung/tests/e2e/videos/
+/tuyendung/tests/e2e/screenshots/
+/tuyendung/tests/unit/coverage/
+/tuyendung/jsconfig.json
+
+# Local Env Files
+/tuyendung/.env.local
+/tuyendung/.env.*.local
+
+# Log Files
+/tuyendung/*.log
+/tuyendung/npm-debug.log*
+/tuyendung/yarn-debug.log*
+/tuyendung/yarn-error.log*
+
+# Unconfigured Editors
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*

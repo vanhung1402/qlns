@@ -1,0 +1,72 @@
+version: '3.6'
+# Deploys MongoDB with customization scripts and container with Mongo client
+# https://fabianlee.org/2018/05/20/docker-using-docker-compose-to-link-a-mongodb-server-and-client/
+#
+# usage:
+# sudo docker-compose build
+# sudo docker-compose up
+
+
+services:
+  my-mongodb:
+    image: mongo:4.2.3-bionic
+    container_name: my-mongodb
+    ports:
+      - 27018:27017
+    environment:
+      - MONGO_INITDB_DATABASE=qlns
+      - MONGO_INITDB_ROOT_USERNAME=qlns
+      - MONGO_INITDB_ROOT_PASSWORD=admin_qlns
+    volumes:
+      # seeding scripts
+      - ./mongo-db/mongo-entrypoint:/docker-entrypoint-initdb.d
+      # named volumes
+      - mongodb:/data/db
+      - mongoconfig:/data/configdb
+    networks:
+      - mongo_net
+
+  recruitment-api:
+    container_name: recruitment-api
+    build: 
+      context: ./api-server
+    depends_on:
+      - my-mongodb
+    restart: always
+    volumes:
+      - ./api-server:/usr/src/recruitment-api
+      - /usr/src/recruitment-api/node_modules
+    environment:
+      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - DB_NAME=qlns
+      - APP_PORT=3001
+    ports: 
+      - '3001:3000'
+    networks:
+      - mongo_net
+
+  authenticate-api:
+    container_name: authenticate-api
+    build: 
+      context: ./authenticate-server
+    depends_on:
+      - my-mongodb
+    restart: always
+    volumes:
+      - ./authenticate-server:/usr/src/authenticate-api
+      - /usr/src/authenticate-api/node_modules
+    environment:
+      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - APP_PORT=3002
+    ports: 
+      - '3002:3000'
+    networks:
+      - mongo_net
+volumes:
+  # default dir on Ubuntu: /var/lib/docker/volumes
+  mongodb:
+  mongoconfig:
+
+networks:
+  mongo_net:
+    driver: bridge
