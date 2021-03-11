@@ -5,6 +5,13 @@ import express from 'express'
 import routes from './routes'
 import database from './database/database'
 
+import auth from './middleware/AuthMiddleware'
+
+import axios from 'axios'
+const authenticateApi = axios.create({
+  baseURL: process.env.AUTHENTICATE_API_URL ? process.env.AUTHENTICATE_API_URL : 'http://192.168.1.160:3002/api/authentication',
+})
+
 const app = express()
 
 // * Application-Level Middleware * //
@@ -18,9 +25,12 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+app.prototype.$authenticate = authenticateApi
+
 // * Routes * //
 
 app.use('/api/session', routes.session)
+app.use(auth.isAuth)
 app.use('/api/danh-muc', routes.category)
 app.use('/api/he-thong', routes.system)
 app.use('/api/tuyen-dung', routes.recruitment)

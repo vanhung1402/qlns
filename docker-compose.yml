@@ -36,7 +36,7 @@ services:
     restart: always
     volumes:
       - ./api-server:/usr/src/recruitment-api
-      - /usr/src/recruitment-api/node_modules
+      - ./api-server/node_modules:/usr/src/recruitment-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - DB_NAME=qlns
@@ -55,7 +55,7 @@ services:
     restart: always
     volumes:
       - ./authenticate-server:/usr/src/authenticate-api
-      - /usr/src/authenticate-api/node_modules
+      # - /usr/src/authenticate-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - APP_PORT=3002
@@ -73,7 +73,7 @@ services:
     restart: always
     volumes:
       - ./tuyendung:/usr/src/frontend-admin
-      - /usr/src/frontend-admin/node_modules
+      # - /usr/src/frontend-admin/node_modules
     environment:
       - APP_PORT=8080
     ports: 
