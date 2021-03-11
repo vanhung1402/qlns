@@ -7,7 +7,6 @@ import PlanDetailCell from '@components/tuyen-dung/recruitment-plan-cell'
 import PlanDetailModal from '@components/tuyen-dung/recruitment-plan-modal'
 import PlanReviewCell from '@components/tuyen-dung/recruitment-review-cell'
 import { dateFilter } from 'vue-date-fns'
-import axios from 'axios'
 
 export default {
   page: {
@@ -63,7 +62,7 @@ export default {
   },
   methods: {
     async loadListRecruitmentPlan() {
-      let promise = await axios.get('/api/tuyen-dung/list-recruitment-plan')
+      let promise = await this.$recruitment.get('/api/tuyen-dung/list-recruitment-plan')
       if (promise.status === 200) {
         this.plans = promise.data
       }
@@ -123,7 +122,7 @@ export default {
           createBy: this.$store.state.auth.currentUser.staff,
         }
 
-        axios
+        this.$recruitment
           .post('/api/tuyen-dung/add-recruitment-plan', newPlan)
           .then((res) => {
             if (res.status === 200) {
@@ -152,7 +151,7 @@ export default {
           },
           recruitmentPlanDetail: this.planDetails,
         }
-        axios
+        this.$recruitment
           .put('/api/tuyen-dung/recruitment-plan/' + this.planUpdateId, {
             action: 'update',
             params: updatePlan,
@@ -201,7 +200,7 @@ export default {
       }
     },
     async loadDetailPlan(planId) {
-      let promise = await axios.get(
+      let promise = await this.$recruitment.get(
         '/api/tuyen-dung/list-recruitment-plan-detail',
         {
           params: { FK_iKehoachTuyendungID: planId },
@@ -250,7 +249,7 @@ export default {
 
       if (btnRemovePlan.isConfirmed) {
         if (btnRemovePlan.value) {
-          axios
+          this.$recruitment
             .put('/api/tuyen-dung/recruitment-plan/' + planIDRemove, {
               action: 'change-status',
               params: {
@@ -301,7 +300,7 @@ export default {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            axios
+            this.$recruitment
               .put('/api/tuyen-dung/recruitment-plan/' + planIDResend, {
               action: 'change-status',
               params: {

@@ -6,7 +6,6 @@ import { required, email } from 'vuelidate/lib/validators'
 import vue2Dropzone from 'vue2-dropzone'
 import ListProfile from '@components/tuyen-dung/recruitment-profile-list'
 import Multiselect from 'vue-multiselect'
-import axios from 'axios'
 import { dateFilter } from 'vue-date-fns'
 
 export default {
@@ -72,7 +71,7 @@ export default {
   },
   methods: {
     async loadrecruitmentPlanDetails() {
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/tuyen-dung/list-recruitment-plan-detail-available')
         .catch((err) => {
           console.error(err)
@@ -86,7 +85,7 @@ export default {
       }
     },
     loadListProfiles() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-profile', {})
         .then((res) => {
           if (res.status === 200) {
@@ -122,7 +121,7 @@ export default {
         planDetail: this.form.planDetail,
         createBy: this.$store.state.auth.currentUser.staff,
       }
-      axios
+      this.$recruitment
         .post('/api/tuyen-dung/profile', newProfile)
         .then((res) => {
           console.log(res)
@@ -152,7 +151,7 @@ export default {
         address: this.form.address,
         planDetail: this.form.planDetail,
       }
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/profile/' + profileUpdateId, {
           params: {
             action: 'updateInfo',

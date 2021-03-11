@@ -2,7 +2,6 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
-import axios from 'axios'
 
 import { VueEditor } from 'vue2-editor'
 
@@ -45,7 +44,7 @@ export default {
   },
   methods: {
     loadDecisionInfo() {
-      axios
+      this.$recruitment
         .get(
           '/api/tuyen-dung/recruitment-decisions/' +
             this.$route.params.decisionId
@@ -172,7 +171,7 @@ export default {
       }
     },
     handleChangeDecisionStatus(decisionUpdateId, status, reason = null) {
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/recruitment-decisions', {
           updateBy: this.$store.state.auth.currentUser.staff,
           decisionUpdateId,

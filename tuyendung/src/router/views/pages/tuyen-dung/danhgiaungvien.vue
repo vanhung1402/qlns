@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import ListProfile from '@components/tuyen-dung/recruitment-profile-list'
-import axios from 'axios'
 
 export default {
   page: {
@@ -56,7 +55,7 @@ export default {
   },
   methods: {
     loadListProfiles() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-profile-with-status', {
           params: {status: [2, 4, 5]}
         })

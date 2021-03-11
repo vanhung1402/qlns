@@ -4,7 +4,7 @@ import Account from './accountController'
 
 exports.getSession = async (request, response) => {
 	let promise = await axios.get(
-		'http://localhost:3080/api/authentication/profile?token=' + request.headers.authorization,
+		'http://192.168.1.160:3002/api/authentication/profile?token=' + request.headers.authorization,
 	)
 		.catch(err => {
 			return response.status(401).json({
@@ -31,7 +31,7 @@ exports.getAuthentication = async (request, response) => {
 
 	if (matchedUser) {
 		let promise = await axios.post(
-			'http://localhost:3080/api/authentication/login',
+			'http://192.168.1.160:3002/api/authentication/login',
 			matchedUser
 		)
 

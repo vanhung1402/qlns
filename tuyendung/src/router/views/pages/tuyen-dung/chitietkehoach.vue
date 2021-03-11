@@ -4,7 +4,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import Overview from '@components/overview'
-import axios from 'axios'
 
 export default {
   page: {
@@ -70,7 +69,7 @@ export default {
   },
   methods: {
     async loadRecruitmentPlan() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/recruitment-plan/' + this.$route.params.planId)
         .then((res) => {
           if (res.status === 200) {
@@ -132,7 +131,7 @@ export default {
       this.overviewData = overview
     },
     async loadRecruitmentPlanDetail() {
-      axios
+      this.$recruitment
         .get(
           '/api/tuyen-dung/recruitment-plan-list-detail/' +
             this.$route.params.planId

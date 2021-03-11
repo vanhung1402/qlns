@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import { required, minLength, sameAs } from 'vuelidate/lib/validators'
-import axios from 'axios'
 
 export default {
   page: {
@@ -40,7 +39,7 @@ export default {
   },
   methods: {
     async changePassword() {
-      const promise = await axios
+      const promise = await this.$recruitment
         .post('/api/he-thong/authenticate', {
           username: this.currentUsername,
           password: this.formChangePassword.currentPassword,
@@ -50,7 +49,7 @@ export default {
         })
 
       if (promise.data) {
-        axios
+        this.$recruitment
           .put('/api/he-thong/doi-mat-khau/' + promise.data.id, {
             newPassword: this.formChangePassword.newPassword,
           })

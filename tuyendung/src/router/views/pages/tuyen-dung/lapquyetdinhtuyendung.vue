@@ -5,7 +5,6 @@ import PageHeader from '@components/page-header'
 import btnTooltip from '@components/button-tooltip'
 import Multiselect from 'vue-multiselect'
 import { VueEditor } from 'vue2-editor'
-import axios from 'axios'
 import RecruitmentDecisionList from '@components/tuyen-dung/recruitmentDecisionList'
 
 export default {
@@ -60,7 +59,7 @@ export default {
   },
   methods: {
     loadListRecuitmentDecisons() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-recruitment-decisions')
         .then((res) => {
           if (res.status === 200) {
@@ -73,7 +72,7 @@ export default {
         })
     },
     loadListProfiles() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-profile-with-status', {
           params: { status: [4] },
         })
@@ -108,7 +107,7 @@ export default {
       })
     },
     handleUpdateNewDecisions() {
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/recruitment-decisions', {
           updateBy: this.$store.state.auth.currentUser.staff,
           contentDecision: this.form.exampleDecision,
@@ -147,7 +146,7 @@ export default {
           }
         }
       )
-      axios
+      this.$recruitment
         .post('/api/tuyen-dung/recruitment-decisions', {
           createBy: this.$store.state.auth.currentUser.staff,
           decision: listDecisions,
@@ -193,7 +192,7 @@ export default {
       return contentDecision
     },
     loadDecisionPattern() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-recruitment-decisions-pattern')
         .then((res) => {
           console.log(res)
@@ -211,7 +210,7 @@ export default {
     handleSaveDecisionPartern() {
       this.submitted = true
       if (this.form.exampleDecision) {
-        axios
+        this.$recruitment
           .post('/api/tuyen-dung/recruitment-decisions-pattern', {
             decisionContent: this.form.exampleDecision,
           })

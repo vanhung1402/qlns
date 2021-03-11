@@ -27,6 +27,7 @@
     "docs": "vuepress dev"
   },
   "dependencies": {
+    "@aacassandra/vue-disable-autocomplete": "^19.5.233",
     "@fullcalendar/bootstrap": "^4.3.0",
     "@fullcalendar/core": "^4.3.1",
     "@fullcalendar/daygrid": "^4.3.0",

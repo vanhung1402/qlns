@@ -20,8 +20,20 @@ import VueToastr2 from 'vue-toastr-2'
 import 'vue-toastr-2/dist/vue-toastr-2.min.css'
 import 'sweetalert2/dist/sweetalert2.min.css'
 
+import axios from 'axios'
+const recruitmentApi = axios.create({
+  baseURL: process.env.RECRUITMENT_API_URL ? process.env.RECRUITMENT_API_URL : 'http://localhost:3001/',
+})
+
+
+const authenticateApi = axios.create({
+  baseURL: process.env.RECRUITMENT_API_URL ? process.env.RECRUITMENT_API_URL : 'http://localhost:3002/',
+})
+
 window.toastr = require('toastr')
 
+Vue.prototype.$recruitment = recruitmentApi
+Vue.prototype.$authenticate = authenticateApi
 Vue.use(VueToastr2)
 Vue.use(VueSweetalert2)
 Vue.use(DisableAutocomplete)

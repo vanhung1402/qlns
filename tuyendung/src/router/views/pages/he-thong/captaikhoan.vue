@@ -12,7 +12,6 @@ import {
 
 import Multiselect from 'vue-multiselect'
 import StatProgress from '@components/widget-stat-progress'
-import axios from 'axios'
 
 export default {
   page: {
@@ -87,7 +86,7 @@ export default {
   },
   methods: {
     loadListAccountStatus(){
-      axios
+      this.$recruitment
         .get('/api/danh-muc/list-account-status', {})
         .then((res) => {
           this.listAccountStatus = res.data
@@ -97,7 +96,7 @@ export default {
         })
     },
     loadListPermission() {
-      axios
+      this.$recruitment
         .get('/api/danh-muc/list-permission', {})
         .then((res) => {
           this.listPermission = res.data
@@ -107,7 +106,7 @@ export default {
         })
     },
     loadListStaff() {
-      axios
+      this.$recruitment
         .get('/api/nhan-vien/list-staff', {})
         .then((res) => {
           let listStaffFormat = res.data.map((staff) => {
@@ -131,7 +130,7 @@ export default {
       newAccount.id = Date.now()
       newAccount.createBy = this.listStaff[0]
       newAccount.status = this.listAccountStatus[0]
-      axios
+      this.$recruitment
         .post('/api/he-thong/account', newAccount)
         .then((res) => {
           if (res.data.PK_iTaikhoanID) {

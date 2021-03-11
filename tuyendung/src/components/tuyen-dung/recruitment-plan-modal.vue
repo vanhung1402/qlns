@@ -2,7 +2,6 @@
 import Multiselect from 'vue-multiselect'
 import { required, minValue, numeric } from 'vuelidate/lib/validators'
 import { dateFilter } from 'vue-date-fns'
-import axios from 'axios'
 
 export default {
   components: { Multiselect },
@@ -75,7 +74,7 @@ export default {
   },
   methods: {
     async loadJobPosition(){
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/cau-hinh/list-job-position')
         .catch((err) => {
           console.error(err)
@@ -85,7 +84,7 @@ export default {
       }
     },
     async loadRecruitmentPostTypes(){
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/danh-muc/list-recruitment-post-type')
         .catch((err) => {
           console.error(err)

@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import { required } from 'vuelidate/lib/validators'
-import axios from 'axios'
 
 export default {
   page: {
@@ -50,7 +49,7 @@ export default {
   },
   methods: {
     async loadlistRecruitmentPostType() {
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/danh-muc/list-recruitment-post-type')
         .catch((err) => {
           console.error(err)
@@ -71,7 +70,7 @@ export default {
         sTenHinhthucDangtuyen: this.form.tenHinhthucDangtuyen,
       }
 
-      axios
+      this.$recruitment
         .post('/api/danh-muc/recruitment-post-type', newViTriCongViec)
         .then((res) => {
           if (res.status === 200) {

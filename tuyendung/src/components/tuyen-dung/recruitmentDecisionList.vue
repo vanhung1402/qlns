@@ -1,6 +1,5 @@
 <script>
 import btnTooltip from '@components/button-tooltip'
-import axios from 'axios'
 
 export default {
   components: {
@@ -109,7 +108,7 @@ export default {
       }
     },
     handleChangeDecisionStatus(decisionUpdateId, status, reason = null) {
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/recruitment-decisions', {
           updateBy: this.$store.state.auth.currentUser.staff,
           decisionUpdateId,

@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import PlanReviewCell from '@components/tuyen-dung/recruitment-review-cell'
-import axios from 'axios'
 
 export default {
   page: {
@@ -41,7 +40,7 @@ export default {
   },
   methods: {
     async loadListRecruitmentPlan() {
-      let promise = await axios.get(
+      let promise = await this.$recruitment.get(
         '/api/tuyen-dung/list-recruitment-plan/status',
         {
           params: { statusId: [1, 2] },
@@ -67,7 +66,7 @@ export default {
 
       if (btnReturnPlan.isConfirmed) {
         if (btnReturnPlan.value) {
-          axios
+          this.$recruitment
             .put('/api/tuyen-dung/recruitment-plan/' + planReturnID, {
               action: 'change-status',
               params: {
@@ -118,7 +117,7 @@ export default {
         })
         .then((result) => {
           if (result.isConfirmed) {
-            axios
+            this.$recruitment
               .put('/api/tuyen-dung/recruitment-plan/' + planApprovedID, {
                 action: 'change-status',
                 params: {

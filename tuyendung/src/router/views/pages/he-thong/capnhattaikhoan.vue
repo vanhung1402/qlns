@@ -4,7 +4,6 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import Multiselect from 'vue-multiselect'
 import { required, minLength, sameAs } from 'vuelidate/lib/validators'
-import axios from 'axios'
 
 import AccountCell from '@components/account-cell'
 
@@ -54,7 +53,7 @@ export default {
   },
   methods: {
     loadListPermission() {
-      axios
+      this.$recruitment
         .get('/api/danh-muc/list-permission', {})
         .then((res) => {
           this.listPermission = res.data
@@ -64,7 +63,7 @@ export default {
         })
     },
     loadListAccount() {
-      axios
+      this.$recruitment
         .get('/api/he-thong/list-account')
         .then((res) => {
           this.listAccount = res.data
@@ -90,7 +89,7 @@ export default {
         this.$v.formChangePassword.$error
       )
         return false
-      axios
+      this.$recruitment
         .put('/api/he-thong/doi-mat-khau/' + this.accountChange.PK_iTaikhoanID, {
           newPassword: this.formChangePassword.password,
         })
@@ -116,7 +115,7 @@ export default {
         this.$v.formChangePermission.$error
       )
         return false
-      axios
+      this.$recruitment
         .put('/api/he-thong/doi-quyen-tai-khoan/' + this.accountChange._id, {
           newPermission: this.formChangePermission.permission,
         })
@@ -149,7 +148,7 @@ export default {
         })
     },
     handleChangeAccountStatus(acc, status){
-      axios
+      this.$recruitment
         .put('/api/he-thong/doi-trang-thai-tai-khoan/' + acc._id, {
           newStatus: status,
         })

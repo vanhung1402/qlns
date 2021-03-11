@@ -4,7 +4,6 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import Multiselect from 'vue-multiselect'
 import { required } from 'vuelidate/lib/validators'
-import axios from 'axios'
 
 export default {
   page: {
@@ -56,7 +55,7 @@ export default {
   },
   methods: {
     async loadlistDepartment() {
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/cau-hinh/list-department')
         .catch((err) => {
           console.error(err)
@@ -66,7 +65,7 @@ export default {
       }
     },
     async loadlistJobPosition() {
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/cau-hinh/list-job-position')
         .catch((err) => {
           console.error(err)
@@ -89,7 +88,7 @@ export default {
         iThutuVitriCongviec: this.listJobPosition.length,
       }
 
-      axios
+      this.$recruitment
         .post('/api/cau-hinh/job-position', newViTriCongViec)
         .then((res) => {
           if (res.status === 200) {

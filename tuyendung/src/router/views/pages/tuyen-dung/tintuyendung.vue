@@ -5,7 +5,6 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import { VueEditor } from 'vue2-editor'
 import { required } from 'vuelidate/lib/validators'
-import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 import RecruitmentPostList from '@components/tuyen-dung/recruitmentPostList'
 
@@ -73,7 +72,7 @@ export default {
   },
   methods: {
     async loadRecruitmentPost() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/list-recruitment-post')
         .then((res) => {
           if (res.status === 200) {
@@ -85,7 +84,7 @@ export default {
         })
     },
     async loadRecruitmentPlanAvailable() {
-      axios
+      this.$recruitment
         .get('/api/tuyen-dung/recruitment-plan-available')
         .then((res) => {
           if (res.status === 200) {
@@ -114,7 +113,7 @@ export default {
         ...{ createBy: this.$store.state.auth.currentUser.staff },
       }
       if (this.updateId) {
-        axios
+        this.$recruitment
           .put('/api/tuyen-dung/recruitment-post/' + this.updateId, newPost)
           .then((res) => {
             if (res.status === 200) {
@@ -138,7 +137,7 @@ export default {
             )
           })
       } else {
-        axios
+        this.$recruitment
           .post('/api/tuyen-dung/recruitment-post', newPost)
           .then((res) => {
             if (res.status === 200) {
@@ -172,7 +171,7 @@ export default {
     },
     async onChangeRecruitmentPlan() {
       if (this.form.recruitmentPlanSelected) {
-        await axios
+        await this.$recruitment
           .get(
             '/api/tuyen-dung/recruitment-plan-list-detail/' +
               this.form.recruitmentPlanSelected._id

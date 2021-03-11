@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import { required } from 'vuelidate/lib/validators'
-import axios from 'axios'
 
 export default {
   page: {
@@ -45,7 +44,7 @@ export default {
   },
   methods: {
     async loadlistDepartment() {
-      let promise = await axios
+      let promise = await this.$recruitment
         .get('/api/cau-hinh/list-department')
         .catch((err) => {
           console.error(err)

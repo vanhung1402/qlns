@@ -1,7 +1,6 @@
 <script>
 import ProfileCell from '@components/tuyen-dung/recruitment-profile-cell'
 import Multiselect from 'vue-multiselect'
-import axios from 'axios'
 
 export default {
   components: { ProfileCell, Multiselect },
@@ -41,7 +40,7 @@ export default {
   },
   methods: {
     async loadEvaluateValue() {
-      axios
+      this.$recruitment
         .get('/api/danh-muc/list-recruitment-profile-status', {
           params: { status: 3 },
         })
@@ -63,7 +62,7 @@ export default {
       this.$emit('handleEditProfile', profileEdit)
     },
     handleBtnRemoveProfile(profileDeleteId) {
-      axios
+      this.$recruitment
         .delete('/api/tuyen-dung/profile/' + profileDeleteId)
         .then((res) => {
           if (res.data.ok) {
@@ -88,7 +87,7 @@ export default {
       const status = data.status
       const title = status === 2 ? 'duyệt' : 'loại'
 
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/profile/' + data.id, {
           params: {
             action: 'updateStatus',
@@ -140,7 +139,7 @@ export default {
       let profileUpdate = {
         result: this.form.resultCandidateEvaluate,
       }
-      axios
+      this.$recruitment
         .put('/api/tuyen-dung/profile/' + this.currentProfile._id, {
           params: {
             action: 'updateCandidateEvaluate',

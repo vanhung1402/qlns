@@ -32,6 +32,7 @@ services:
       context: ./api-server
     depends_on:
       - my-mongodb
+      - authenticate-api
     restart: always
     volumes:
       - ./api-server:/usr/src/recruitment-api
@@ -62,10 +63,29 @@ services:
       - '3002:3000'
     networks:
       - mongo_net
+    
+  frontend-admin:
+    container_name: frontend-admin
+    build: 
+      context: ./tuyendung
+    depends_on:
+      - recruitment-api
+    restart: always
+    volumes:
+      - ./tuyendung:/usr/src/frontend-admin
+      - /usr/src/frontend-admin/node_modules
+    environment:
+      - APP_PORT=8080
+    ports: 
+      - '8080:8080'
+    networks:
+      - mongo_net
 volumes:
   # default dir on Ubuntu: /var/lib/docker/volumes
   mongodb:
   mongoconfig:
+  usr:
+  data:
 
 networks:
   mongo_net:
