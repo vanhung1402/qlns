@@ -45,6 +45,27 @@ services:
       - '3001:3000'
     networks:
       - mongo_net
+    
+  staff-api:
+    container_name: staff-api
+    command: python -u app.py
+    build: 
+      context: ./staff-api
+    depends_on:
+      - my-mongodb
+      - authenticate-api
+      - recruitment-api
+    restart: always
+    volumes:
+      - ./staff-api:/usr/src/staff-api
+      - ./staff-api/node_modules:/usr/src/staff-api/node_modules
+    environment:
+      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - DB_NAME=qlns
+    ports: 
+      - '3003:5000'
+    networks:
+      - mongo_net
 
   authenticate-api:
     container_name: authenticate-api

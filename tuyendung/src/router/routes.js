@@ -363,7 +363,7 @@ const employeeManagement = [
         path: 'so-yeu-ly-lich',
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/apps/email/inbox')),
+          lazyLoadView(import('@views/pages/nhan-vien/soyeulylich')),
       },
       {
         name: 'Thuyên chuyển phòng ban',

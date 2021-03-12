@@ -1,10 +1,17 @@
 import mongoose from 'mongoose'
+const Schema = mongoose.Schema
 
 const staffSchema = mongoose.Schema({
     PK_iNhanvienID: {
         type: Number,
         default: Date.now(),
         unique: true
+    },
+    sMaNhanvien: {
+        type: String,
+        default: Date.now(),
+        unique: true,
+        required: true,
     },
     sHoten: {
         type: String,
@@ -18,8 +25,16 @@ const staffSchema = mongoose.Schema({
         type: Date,
         required: true,
     },
+    sNoisinh: {
+        type: String,
+        required: true
+    },
     bGioitinh: {
         type: Boolean,
+        required: true
+    },
+    sNguyenquan: {
+        type: String,
         required: true
     },
     sDiachi: {
@@ -40,10 +55,25 @@ const staffSchema = mongoose.Schema({
         unique: true,
         required: true
     },
+    dNgaycapCMND: {
+        type: Date,
+        required: true,
+    },
+    sNoicapCMND: {
+        type: String,
+        required: true
+    },
+    sTrinhdoVanhoa: {
+        type: String,
+        required: true
+    },
     sMasothue: {
         type: String,
-        unique: true,
-        required: true
+    },
+    FK_iDantocID: { type: Schema.Types.ObjectId, ref: 'Nation' },
+    FK_iTongiaoID: { type: Schema.Types.ObjectId, ref: 'Religion' },
+    sMotaBanthan: {
+        type: String,
     },
     sDuongdanSoyeuLylich: {
         type: String,

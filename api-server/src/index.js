@@ -30,7 +30,7 @@ app.prototype.$authenticate = authenticateApi
 // * Routes * //
 
 app.use('/api/session', routes.session)
-app.use(auth.isAuth)
+// app.use(auth.isAuth)
 app.use('/api/danh-muc', routes.category)
 app.use('/api/he-thong', routes.system)
 app.use('/api/tuyen-dung', routes.recruitment)

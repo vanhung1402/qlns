@@ -1,30 +1,41 @@
 import os
+
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
+from bson import json_util
+from flask.json import JSONEncoder
 
-app = Flask("DockerTutorial")
+from profile.routes import profile_blueprint
 
-client = MongoClient('mongodb://db:27017/')
-db = client.doantuyendung
+class CustomJSONEncoder(JSONEncoder):
+    def default(self, obj):
+        return str(obj)
 
-@app.route("/")
-def index():
-    _items = db.jobposition.find()
-    items = [items for items in _items]
+app = Flask(__name__)
+client = MongoClient(os.environ['MONGO_URL'])
+app.db = client.qlns
+app.json_encoder = CustomJSONEncoder
 
+app.register_blueprint(profile_blueprint, url_prefix="/profile")
+
+@app.route('/')
+def todo():
+    _items = app.db.Account.find()
+    items = [item for item in _items]
+    print(items)
     return jsonify(items)
 
 
-@app.route("/new", methods=["POST"])
+@app.route('/new', methods=['POST'])
 def new():
-    data = {
-        "helloworld": request.form["helloworld"]
+
+    item_doc = {
+        'name': request.form['name'],
+        'description': request.form['description']
     }
+    db.tododb.insert_one(item_doc)
 
-    db.appdb.insert_one(data)
-
-    return redirect(url_for("index"))
+    return redirect(url_for('todo'))
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
-
+    app.run(host='0.0.0.0', debug=True)
