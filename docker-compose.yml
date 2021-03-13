@@ -11,13 +11,11 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=qlns
       - MONGO_INITDB_ROOT_PASSWORD=admin_qlns
     volumes:
-      # seeding scripts
       - ./mongo-db/mongo-entrypoint:/docker-entrypoint-initdb.d
-      # named volumes
-      - mongodb:/data/db
-      - mongoconfig:/data/configdb
+      - ./mongo-db/mongodb:/data/db
+      - ./mongo-db/mongoconfig:/data/configdb
     networks:
-      - mongo_net
+      - qlns_net
 
   recruitment-api:
     container_name: recruitment-api
@@ -37,7 +35,7 @@ services:
     ports: 
       - '3001:3000'
     networks:
-      - mongo_net
+      - qlns_net
     
   staff-api:
     container_name: staff-api
@@ -57,7 +55,7 @@ services:
     ports: 
       - '3003:3000'
     networks:
-      - mongo_net
+      - qlns_net
 
   authenticate-api:
     container_name: authenticate-api
@@ -68,14 +66,13 @@ services:
     restart: always
     volumes:
       - ./authenticate-service:/usr/src/authenticate-api
-      # - /usr/src/authenticate-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - APP_PORT=3002
     ports: 
       - '3002:3000'
     networks:
-      - mongo_net
+      - qlns_net
     
   admin-frontend:
     container_name: admin-frontend
@@ -96,7 +93,7 @@ services:
     ports: 
       - '8080:8080'
     networks:
-      - mongo_net
+      - qlns_net
 volumes:
   mongodb:
   mongoconfig:
@@ -104,5 +101,5 @@ volumes:
   data:
 
 networks:
-  mongo_net:
+  qlns_net:
     driver: bridge
