@@ -22,18 +22,22 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 
 import axios from 'axios'
 const recruitmentApi = axios.create({
-  baseURL: process.env.RECRUITMENT_API_URL ? process.env.RECRUITMENT_API_URL : 'http://localhost:3001/',
+  baseURL: process.env.RECRUITMENT_API_URL ? process.env.RECRUITMENT_API_URL : 'http://recruitment-api:3000/',
 })
 
-
 const authenticateApi = axios.create({
-  baseURL: process.env.RECRUITMENT_API_URL ? process.env.RECRUITMENT_API_URL : 'http://localhost:3002/',
+  baseURL: process.env.AUTHENTICATE_API_URL ? process.env.AUTHENTICATE_API_URL : 'http://authenticate-api:3000/',
+})
+
+const staffApi = axios.create({
+  baseURL: process.env.STAFF_API_URL ? process.env.STAFF_API_URL : 'http://staff-api:3000/',
 })
 
 window.toastr = require('toastr')
 
 Vue.prototype.$recruitment = recruitmentApi
 Vue.prototype.$authenticate = authenticateApi
+Vue.prototype.$staff = staffApi
 Vue.use(VueToastr2)
 Vue.use(VueSweetalert2)
 Vue.use(DisableAutocomplete)

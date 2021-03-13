@@ -107,9 +107,9 @@ exports.getAccount = async ({username, password}) => {
     const user = !doc ? null : {
         id: doc.PK_iTaikhoanID,
         username: doc.sTenTaikhoan,
-        name: doc.FK_iNhanvienID.sHoten,
-        staff: doc.FK_iNhanvienID.PK_iNhanvienID,
-        email: doc.FK_iNhanvienID.sEmail,
+        name: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.sHoten : '',
+        staff: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.PK_iNhanvienID : '',
+        email: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.sEmail : '',
         permissionname: doc.FK_iQuyenID.sTenQuyen,
         token: `valid-token-for-${doc.sTenTaikhoan}`,
         available: doc.FK_iTrangthaiTaikhoan.PK_iTrangthaiTaikhoanID

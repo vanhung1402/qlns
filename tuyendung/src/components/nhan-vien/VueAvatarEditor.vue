@@ -28,7 +28,7 @@
       </label>
     </div>
     <div class="form-group text-center">
-      <button class="btn btn-sm btn-secondary" @click="finished"
+      <button type="button" class="btn btn-sm btn-secondary" @click="finished"
         ><i class="uil uil-crop-alt"></i> &nbsp; {{ finishText }}</button
       >
     </div>

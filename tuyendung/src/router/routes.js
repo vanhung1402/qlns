@@ -359,11 +359,11 @@ const employeeManagement = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
     children: [
       {
-        name: 'Sơ yếu lý lịch',
-        path: 'so-yeu-ly-lich',
+        name: 'Hồ sơ nhân viên',
+        path: 'ho-so-nhan-vien',
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/nhan-vien/soyeulylich')),
+          lazyLoadView(import('@views/pages/nhan-vien/hosonhanvien')),
       },
       {
         name: 'Thuyên chuyển phòng ban',

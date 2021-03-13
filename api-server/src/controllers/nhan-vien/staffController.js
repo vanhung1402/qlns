@@ -1,6 +1,6 @@
-import { request, response } from 'express';
 import Staff from '../../database/models/nhan-vien/staff'
 import { format as dateFormat, compareAsc } from 'date-fns'
+import WorkProcess from '../../database/models/nhan-vien/workProcess'
 
 exports.addExample = () => {
     let id = Date.now()
@@ -53,14 +53,21 @@ exports.addExample = () => {
 
 exports.getList = (request, response) => {
     let filter = request.body.filter
-    Staff.find(filter, function (err, listStaff) {
-        if (err)
-            response.send(err)
-        let listStaffFormat = listStaff.map(staff => {
-            const formatStaff = JSON.parse(JSON.stringify(staff))
-            formatStaff.tNgaysinh = dateFormat(staff.dNgaysinh, 'dd/MM/yyyy')
-            return formatStaff
+    Staff
+        .find(filter)
+        .populate({
+            path: 'FK_iVitriCongviecID',
+            select: 'sTenVitriCongviec FK_iBophanID',
+            populate: 'FK_iBophanID'
         })
-        response.json(listStaffFormat)
-    })
+        .exec(function (err, listStaff) {
+            if (err)
+                response.send(err)
+            let listStaffFormat = listStaff.map(staff => {
+                const formatStaff = JSON.parse(JSON.stringify(staff))
+                formatStaff.tNgaysinh = dateFormat(staff.dNgaysinh, 'dd/MM/yyyy')
+                return formatStaff
+            })
+            response.json(listStaffFormat)
+        })
 }

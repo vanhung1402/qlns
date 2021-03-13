@@ -58,12 +58,11 @@ services:
     restart: always
     volumes:
       - ./staff-api:/usr/src/staff-api
-      - ./staff-api/node_modules:/usr/src/staff-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - DB_NAME=qlns
     ports: 
-      - '3003:5000'
+      - '3003:3000'
     networks:
       - mongo_net
 
@@ -91,6 +90,8 @@ services:
       context: ./tuyendung
     depends_on:
       - recruitment-api
+      - staff-api
+      - authenticate-api
     restart: always
     volumes:
       - ./tuyendung:/usr/src/frontend-admin

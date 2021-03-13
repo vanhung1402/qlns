@@ -1,3 +1,4 @@
+const cors = require('cors')
 const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
@@ -122,6 +123,7 @@ router.get('/profile', (req, res) => {
     res.json(req.decoded)
 })
 
+app.use(cors())
 app.use(bodyParser.json());
 
 app.use('/api/authentication', router);

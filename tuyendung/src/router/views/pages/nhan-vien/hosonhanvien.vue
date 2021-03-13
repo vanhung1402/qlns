@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import VueAvatarEditor from '@components/nhan-vien/VueAvatarEditor'
+import StaffProfileList from '@components/nhan-vien/staffProfileList'
 import { required, email } from 'vuelidate/lib/validators'
 import Multiselect from 'vue-multiselect'
 import { VueEditor } from 'vue2-editor'
@@ -18,10 +19,11 @@ export default {
     VueAvatarEditor,
     Multiselect,
     VueEditor,
+    StaffProfileList,
   },
   data() {
     return {
-      title: 'sơ yêu lý lịch',
+      title: 'Hồ sơ nhân viên',
       items: [
         {
           text: 'Locifa',
@@ -32,7 +34,7 @@ export default {
           href: '/',
         },
         {
-          text: 'Sơ yếu lý lịch',
+          text: 'Hồ sơ nhân viên',
           active: true,
         },
       ],
@@ -41,7 +43,9 @@ export default {
       submitted: false,
       listNation: [],
       listReligion: [],
-      form: {
+      listJobPosition: [],
+      listStaffProfile: [],
+      formStaff: {
         sMaNhanvien: '',
         sHoten: '',
         dNgaysinh: '',
@@ -60,25 +64,148 @@ export default {
         FK_iTongiaoID: null,
         sMotaBanthan: '',
         sDuongdanSoyeuLylich: '',
+        sDuongdanAnhdaidien: '',
+      },
+      formWorkProcess: {
+        FK_iVitriCongviecID: null,
+        dNgayBatdau: '',
+        dNgayKethuc: '',
       },
     }
   },
+  created() {
+    this.loadNation()
+    this.loadResligion()
+    this.loadJobPosition()
+    this.loadListStaffProfile()
+  },
   methods: {
-    saveClicked: function saveClicked(img) {},
-
+    async loadListStaffProfile() {
+      this.$staff
+        .get('/nhan-vien/danh-sach')
+        .then((res) => {
+          console.log(res.data)
+          if (res.status === 200 && res.data) {
+            this.listStaffProfile = res.data
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    async loadNation() {
+      this.$staff
+        .get('/danh-muc/list-nation')
+        .then((res) => {
+          if (res.status === 200 && res.data) {
+            this.listNation = res.data
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    async loadResligion() {
+      this.$staff
+        .get('/danh-muc/list-religion')
+        .then((res) => {
+          if (res.status === 200 && res.data) {
+            this.listReligion = res.data
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    async loadJobPosition() {
+      let promise = await this.$recruitment
+        .get('/api/cau-hinh/list-job-position')
+        .catch((err) => {
+          console.error(err)
+        })
+      if (promise.status === 200) {
+        this.listJobPosition = promise.data
+      }
+    },
+    saveClicked(img) {
+      let linkAvatar = img.toDataURL()
+      this.formStaff.sDuongdanAnhdaidien = linkAvatar.split(',')[1]
+    },
+    changeAvatar(e) {
+      console.log(e[0])
+    },
     handleSubmit(e) {
       this.submitted = true
-      this.$v.form.$touch()
+      this.$v.formStaff.$touch()
       if (
-        this.$v.form.$pending ||
-        this.$v.form.$error ||
-        !this.form.FK_iDantocID ||
-        !this.form.FK_iTongiaoID
+        this.$v.formStaff.$pending ||
+        this.$v.formStaff.$error ||
+        !this.formStaff.FK_iDantocID ||
+        !this.formStaff.FK_iTongiaoID
       )
         return false
+      if (
+        !this.isUpdate &&
+        (this.$v.formWorkProcess.$pending ||
+          this.$v.formWorkProcess.$error ||
+          !this.formWorkProcess.FK_iVitriCongviecID)
+      )
+        return false
+      this.handleAddNewStaff()
+    },
+    handleAddNewStaff() {
+      const newStaff = { ...this.formStaff }
+      newStaff.PK_iNhanvienID = Date.now()
+      newStaff.PK_iNguoithemID = this.$store.state.auth.currentUser.staff
+      newStaff.FK_iDantocID = this.formStaff.FK_iDantocID._id
+      newStaff.FK_iTongiaoID = this.formStaff.FK_iTongiaoID._id
+      newStaff.sTen = this.getLastNameFromFullName(newStaff.sHoten)
+      newStaff.dNgaysinh = new Date(
+        this.convertDate(newStaff.dNgaysinh)
+      ).toISOString()
+      newStaff.dNgaycapCMND = new Date(
+        this.convertDate(newStaff.dNgaycapCMND)
+      ).toISOString()
+
+      const staffWorkProcess = { ...this.formWorkProcess }
+      staffWorkProcess.PK_iQuatrinhLamviecID = Date.now()
+      staffWorkProcess.FK_iNguoiChuyenID = this.$store.state.auth.currentUser.staff
+      staffWorkProcess.tThoigianChuyen = new Date().toISOString()
+      staffWorkProcess.FK_iVitriCongviecID =
+        staffWorkProcess.FK_iVitriCongviecID._id
+      staffWorkProcess.dNgayBatdau = new Date(
+        this.convertDate(staffWorkProcess.dNgayBatdau)
+      ).toISOString()
+      if (staffWorkProcess.dNgayKethuc) {
+        staffWorkProcess.dNgayKethuc = new Date(
+          this.convertDate(staffWorkProcess.dNgayKethuc)
+        ).toISOString()
+      }
+
+      this.$staff
+        .post('/nhan-vien/ho-so', {
+          staffData: newStaff,
+          staffWorkProcess,
+        })
+        .then((res) => {
+          console.log(res)
+          this.loadListStaffProfile()
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    convertDate(date) {
+      date = date.split('/')
+      let newDate = [date[1], date[0], date[2]]
+      return newDate.join('/')
+    },
+    getLastNameFromFullName(fullName) {
+      fullName = fullName.replaceAll('  ', ' ').split(' ')
+      return [...fullName].pop()
     },
     handleResetForm() {
-      this.form = {
+      this.formStaff = {
         sMaNhanvien: '',
         sHoten: '',
         dNgaysinh: '',
@@ -97,12 +224,20 @@ export default {
         FK_iTongiaoID: '',
         sMotaBanthan: '',
         sDuongdanSoyeuLylich: '',
+        sDuongdanAnhdaidien: '',
       }
+
+      this.formWorkProcess = {
+        FK_iVitriCongviecID: null,
+        dNgayBatdau: '',
+        dNgayKethuc: '',
+      }
+
       this.submitted = false
     },
   },
   validations: {
-    form: {
+    formStaff: {
       sMaNhanvien: { required },
       sHoten: { required },
       dNgaysinh: { required },
@@ -115,8 +250,9 @@ export default {
       dNgaycapCMND: { required },
       sNoicapCMND: { required },
       sTrinhdoVanhoa: { required },
-      sMotaBanthan: { required },
-      sDuongdanSoyeuLylich: { required },
+    },
+    formWorkProcess: {
+      dNgayBatdau: { required },
     },
   },
 }
@@ -138,6 +274,7 @@ export default {
                 :has-scale="true"
                 :finish-text="'Cắt ảnh'"
                 @finished="saveClicked"
+                @select-file="changeAvatar($event)"
               />
             </div>
             <div>
@@ -148,16 +285,17 @@ export default {
                   >
                   <input
                     id="ma-nhan-vien"
-                    v-model="form.sMaNhanvien"
+                    v-model="formStaff.sMaNhanvien"
                     type="text"
                     class="form-control"
                     placeholder="VD: HC3006"
                     :class="{
-                      'is-invalid': submitted && $v.form.sMaNhanvien.$error,
+                      'is-invalid':
+                        submitted && $v.formStaff.sMaNhanvien.$error,
                     }"
                   />
                   <div
-                    v-if="submitted && !$v.form.sMaNhanvien.required"
+                    v-if="submitted && !$v.formStaff.sMaNhanvien.required"
                     class="invalid-feedback"
                     >Chưa nhập mã nhân viên</div
                   >
@@ -167,16 +305,16 @@ export default {
                     >Họ tên <span class="text-danger">*</span></label
                   >
                   <input
-                    v-model="form.sHoten"
+                    v-model="formStaff.sHoten"
                     type="text"
                     class="form-control"
                     placeholder="VD: Bùi Văn Hùng"
                     :class="{
-                      'is-invalid': submitted && $v.form.sHoten.$error,
+                      'is-invalid': submitted && $v.formStaff.sHoten.$error,
                     }"
                   />
                   <div
-                    v-if="submitted && !$v.form.sHoten.required"
+                    v-if="submitted && !$v.formStaff.sHoten.required"
                     class="invalid-feedback"
                     >Chưa nhập họ tên nhân viên</div
                   >
@@ -187,18 +325,18 @@ export default {
                   >
                   <input
                     id="ngay-sinh"
-                    v-model="form.dNgaysinh"
+                    v-model="formStaff.dNgaysinh"
                     v-mask="'##/##/####'"
                     placeholder="dd/mm/yyyy"
                     type="text"
                     name="ngay-sinh"
                     :class="{
-                      'is-invalid': submitted && $v.form.dNgaysinh.$error,
+                      'is-invalid': submitted && $v.formStaff.dNgaysinh.$error,
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.form.dNgaysinh.required"
+                    v-if="submitted && !$v.formStaff.dNgaysinh.required"
                     class="invalid-feedback"
                     >Chưa nhập ngày sinh nhân viên</div
                   >
@@ -210,7 +348,7 @@ export default {
                       <div class="custom-control custom-radio">
                         <input
                           id="male"
-                          v-model="form.bGioitinh"
+                          v-model="formStaff.bGioitinh"
                           value="1"
                           type="radio"
                           name="gioi-tinh"
@@ -225,7 +363,7 @@ export default {
                       <div class="custom-control custom-radio">
                         <input
                           id="female"
-                          v-model="form.bGioitinh"
+                          v-model="formStaff.bGioitinh"
                           value="0"
                           type="radio"
                           name="gioi-tinh"
@@ -245,20 +383,20 @@ export default {
                   </label>
                   <input
                     id="so-dien-thoai"
-                    v-model="form.sDienthoai"
+                    v-model="formStaff.sDienthoai"
                     v-mask="'####-###-###'"
                     type="text"
                     class="form-control"
                     :class="{
-                      'is-invalid': submitted && $v.form.sDienthoai.$error,
+                      'is-invalid': submitted && $v.formStaff.sDienthoai.$error,
                     }"
                     placeholder="VD: 0329-222-617"
                   />
                   <div
-                    v-if="submitted && $v.form.sDienthoai.$error"
+                    v-if="submitted && $v.formStaff.sDienthoai.$error"
                     class="invalid-feedback"
                   >
-                    <span v-if="!$v.form.sDienthoai.required"
+                    <span v-if="!$v.formStaff.sDienthoai.required"
                       >Chưa nhập số điện thoại.</span
                     >
                   </div>
@@ -270,23 +408,23 @@ export default {
                   </label>
                   <input
                     id="email"
-                    v-model="form.sEmail"
+                    v-model="formStaff.sEmail"
                     type="email"
                     name="email"
                     class="form-control"
                     :class="{
-                      'is-invalid': submitted && $v.form.sEmail.$error,
+                      'is-invalid': submitted && $v.formStaff.sEmail.$error,
                     }"
                     placeholder="VD: vanhung14.2.2017@gmail.com"
                   />
                   <div
-                    v-if="submitted && $v.form.sEmail.$error"
+                    v-if="submitted && $v.formStaff.sEmail.$error"
                     class="invalid-feedback"
                   >
-                    <span v-if="!$v.form.sEmail.required"
+                    <span v-if="!$v.formStaff.sEmail.required"
                       >Email không được bỏ trống.</span
                     >
-                    <span v-if="!$v.form.sEmail.email"
+                    <span v-if="!$v.formStaff.sEmail.email"
                       >Email không đúng định dạng.</span
                     >
                   </div>
@@ -298,17 +436,17 @@ export default {
                   <input
                     id="dia-chi"
                     ref="dia-chi"
-                    v-model="form.sDiachi"
+                    v-model="formStaff.sDiachi"
                     type="text"
                     name="dia-chi"
                     placeholder="VD: Vĩnh Đồng, Kim Bôi, Hòa Bình"
                     :class="{
-                      'is-invalid': submitted && $v.form.sDiachi.$error,
+                      'is-invalid': submitted && $v.formStaff.sDiachi.$error,
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.form.sDiachi.required"
+                    v-if="submitted && !$v.formStaff.sDiachi.required"
                     class="invalid-feedback"
                     >Chưa nhập địa chỉ.</div
                   >
@@ -320,9 +458,9 @@ export default {
                   </label>
                   <multiselect
                     id="dan-toc"
-                    v-model="form.FK_iDantocID"
+                    v-model="formStaff.FK_iDantocID"
                     name="dan-toc"
-                    label="titleSelect"
+                    label="sTenDantoc"
                     track-by="_id"
                     placeholder="Chọn dân tộc"
                     :show-labels="false"
@@ -332,7 +470,7 @@ export default {
                     class="invalid-feedback"
                     :class="{
                       'invalid-feedback invalid-feedback-select':
-                        submitted && !form.FK_iDantocID,
+                        submitted && !formStaff.FK_iDantocID,
                     }"
                     >Vui lòng chọn dân tộc.</div
                   >
@@ -344,17 +482,18 @@ export default {
                   <input
                     id="nguyen-quan"
                     ref="nguyen-quan"
-                    v-model="form.sNguyenquan"
+                    v-model="formStaff.sNguyenquan"
                     type="text"
                     name="nguyen-quan"
                     placeholder="VD: Vĩnh Đồng, Kim Bôi, Hòa Bình"
                     :class="{
-                      'is-invalid': submitted && $v.form.sNguyenquan.$error,
+                      'is-invalid':
+                        submitted && $v.formStaff.sNguyenquan.$error,
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.form.sNguyenquan.required"
+                    v-if="submitted && !$v.formStaff.sNguyenquan.required"
                     class="invalid-feedback"
                     >Chưa nhập nguyên quán.</div
                   >
@@ -366,9 +505,9 @@ export default {
                   </label>
                   <multiselect
                     id="ton-giao"
-                    v-model="form.FK_iTongiaoID"
+                    v-model="formStaff.FK_iTongiaoID"
                     name="ton-giao"
-                    label="titleSelect"
+                    label="sTenTongiao"
                     track-by="_id"
                     placeholder="Chọn tôn giáo"
                     :show-labels="false"
@@ -378,7 +517,7 @@ export default {
                     class="invalid-feedback"
                     :class="{
                       'invalid-feedback invalid-feedback-select':
-                        submitted && !form.FK_iTongiaoID,
+                        submitted && !formStaff.FK_iTongiaoID,
                     }"
                     >Vui lòng chọn tôn giáo.</div
                   >
@@ -390,21 +529,85 @@ export default {
                   <input
                     id="noi-sinh"
                     ref="noi-sinh"
-                    v-model="form.sNoisinh"
+                    v-model="formStaff.sNoisinh"
                     type="text"
                     name="noi-sinh"
                     placeholder="VD: Vĩnh Đồng, Kim Bôi, Hòa Bình"
                     :class="{
-                      'is-invalid': submitted && $v.form.sNoisinh.$error,
+                      'is-invalid': submitted && $v.formStaff.sNoisinh.$error,
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.form.sNoisinh.required"
+                    v-if="submitted && !$v.formStaff.sNoisinh.required"
                     class="invalid-feedback"
                     >Chưa nhập nơi sinh.</div
                   >
                 </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="!isUpdate">
+            <hr />
+            <div class="row">
+              <div class="col-md-8 form-group">
+                <label for="jobPosition">
+                  Vị trí công việc
+                  <span class="text-danger">*</span>
+                </label>
+                <multiselect
+                  id="jobPosition"
+                  v-model="formWorkProcess.FK_iVitriCongviecID"
+                  name="jobPosition"
+                  label="sTenVitriCongviec"
+                  track-by="_id"
+                  placeholder="Chọn vị trí công việc"
+                  :show-labels="false"
+                  :options="listJobPosition"
+                ></multiselect>
+                <div
+                  class="invalid-feedback"
+                  :class="{
+                    'invalid-feedback invalid-feedback-select':
+                      submitted && !formWorkProcess.FK_iVitriCongviecID,
+                  }"
+                  >Vui lòng chọn vị trí công việc.</div
+                >
+              </div>
+              <div class="col-md-2 form-group">
+                <label for="ngay-bat-dau-cong-viec"
+                  >Ngày bắt đầu <span class="text-danger">*</span></label
+                >
+                <input
+                  id="ngay-bat-dau-cong-viec"
+                  v-model="formWorkProcess.dNgayBatdau"
+                  v-mask="'##/##/####'"
+                  placeholder="dd/mm/yyyy"
+                  type="text"
+                  name="ngay-bat-dau-cong-viec"
+                  :class="{
+                    'is-invalid':
+                      submitted && $v.formWorkProcess.dNgayBatdau.$error,
+                  }"
+                  class="form-control"
+                />
+                <div
+                  v-if="submitted && !$v.formWorkProcess.dNgayBatdau.required"
+                  class="invalid-feedback"
+                  >Chưa nhập ngày bắt đầu công việc</div
+                >
+              </div>
+              <div class="col-md-2 form-group">
+                <label for="ngay-bat-dau-cong-viec">Ngày kết thúc</label>
+                <input
+                  id="ngay-ket-thuc-cong-viec"
+                  v-model="formWorkProcess.dNgayKethuc"
+                  v-mask="'##/##/####'"
+                  placeholder="dd/mm/yyyy"
+                  type="text"
+                  name="ngay-ket-thuc-cong-viec"
+                  class="form-control"
+                />
               </div>
             </div>
           </div>
@@ -418,16 +621,16 @@ export default {
                   >
                   <input
                     id="so-cmnd"
-                    v-model="form.sCMND"
+                    v-model="formStaff.sCMND"
                     type="text"
                     class="form-control"
                     placeholder="VD: 113704072"
                     :class="{
-                      'is-invalid': submitted && $v.form.sCMND.$error,
+                      'is-invalid': submitted && $v.formStaff.sCMND.$error,
                     }"
                   />
                   <div
-                    v-if="submitted && !$v.form.sCMND.required"
+                    v-if="submitted && !$v.formStaff.sCMND.required"
                     class="invalid-feedback"
                     >Chưa nhập số CMND</div
                   >
@@ -438,18 +641,19 @@ export default {
                   >
                   <input
                     id="ngay-cap-cmnd"
-                    v-model="form.dNgaycapCMND"
+                    v-model="formStaff.dNgaycapCMND"
                     v-mask="'##/##/####'"
                     placeholder="dd/mm/yyyy"
                     type="text"
                     name="ngay-cap-cmnd"
                     :class="{
-                      'is-invalid': submitted && $v.form.dNgaycapCMND.$error,
+                      'is-invalid':
+                        submitted && $v.formStaff.dNgaycapCMND.$error,
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.form.dNgaycapCMND.required"
+                    v-if="submitted && !$v.formStaff.dNgaycapCMND.required"
                     class="invalid-feedback"
                     >Chưa nhập ngày cấp CMND</div
                   >
@@ -460,36 +664,38 @@ export default {
                   >
                   <input
                     id="noi-cap-cmnd"
-                    v-model="form.sNoicapCMND"
+                    v-model="formStaff.sNoicapCMND"
                     type="text"
                     class="form-control"
                     placeholder="VD: CA Hòa Bình"
                     :class="{
-                      'is-invalid': submitted && $v.form.sNoicapCMND.$error,
+                      'is-invalid':
+                        submitted && $v.formStaff.sNoicapCMND.$error,
                     }"
                   />
                   <div
-                    v-if="submitted && !$v.form.sNoicapCMND.required"
+                    v-if="submitted && !$v.formStaff.sNoicapCMND.required"
                     class="invalid-feedback"
                     >Chưa nhập nơi cấp CMND</div
                   >
                 </div>
-								<div class="col-md-6 form-group">
+                <div class="col-md-6 form-group">
                   <label for="trinh-do-van-hoa"
                     >Trình độ văn hóa <span class="text-danger">*</span></label
                   >
                   <input
                     id="trinh-do-van-hoa"
-                    v-model="form.sTrinhdoVanhoa"
+                    v-model="formStaff.sTrinhdoVanhoa"
                     type="text"
                     class="form-control"
                     placeholder="VD: Đại học"
                     :class="{
-                      'is-invalid': submitted && $v.form.sTrinhdoVanhoa.$error,
+                      'is-invalid':
+                        submitted && $v.formStaff.sTrinhdoVanhoa.$error,
                     }"
                   />
                   <div
-                    v-if="submitted && !$v.form.sTrinhdoVanhoa.required"
+                    v-if="submitted && !$v.formStaff.sTrinhdoVanhoa.required"
                     class="invalid-feedback"
                     >Chưa nhập trình độ văn hóa</div
                   >
@@ -498,7 +704,7 @@ export default {
                   <label for="ma-so-thue">Mã số thuế</label>
                   <input
                     id="ma-so-thue"
-                    v-model="form.sMasothue"
+                    v-model="formStaff.sMasothue"
                     type="text"
                     class="form-control"
                     placeholder="VD: 109273837"
@@ -510,8 +716,8 @@ export default {
               <label for="mo-ta-ban-than">Mô tả bản thân</label>
               <vue-editor
                 id="mo-ta-ban-than"
-                v-model="form.sMotaBanthan"
-								:height="175"
+                v-model="formStaff.sMotaBanthan"
+                :height="175"
               ></vue-editor>
             </div>
           </div>
@@ -545,6 +751,7 @@ export default {
         </form>
       </div>
     </div>
+    <StaffProfileList :list-staff-profile="listStaffProfile" />
   </Layout>
 </template>
 <style>
@@ -562,7 +769,7 @@ export default {
 .invalid-feedback.invalid-feedback-select {
   display: block;
 }
-.form-group .ql-editor{
-	min-height: 138px;
+.form-group .ql-editor {
+  min-height: 138px;
 }
 </style>

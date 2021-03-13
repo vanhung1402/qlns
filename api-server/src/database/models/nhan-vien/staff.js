@@ -72,10 +72,15 @@ const staffSchema = mongoose.Schema({
     },
     FK_iDantocID: { type: Schema.Types.ObjectId, ref: 'Nation' },
     FK_iTongiaoID: { type: Schema.Types.ObjectId, ref: 'Religion' },
+    FK_iNguoithemID: { type: Schema.Types.ObjectId, ref: 'Staff', required: true },
+    FK_iNguoicapnhatID: { type: Schema.Types.ObjectId, ref: 'Staff' },
     sMotaBanthan: {
         type: String,
     },
     sDuongdanSoyeuLylich: {
+        type: String,
+    },
+    sDuongdanAnhdaidien: {
         type: String,
     }
 })

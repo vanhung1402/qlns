@@ -4,19 +4,26 @@ from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
 from bson import json_util
 from flask.json import JSONEncoder
+from flask_cors import CORS
 
 from profile.routes import profile_blueprint
+from category.routes import category_blueprint
+from staff.routes import staff_blueprint
 
 class CustomJSONEncoder(JSONEncoder):
     def default(self, obj):
         return str(obj)
 
 app = Flask(__name__)
+CORS(app)
+
 client = MongoClient(os.environ['MONGO_URL'])
 app.db = client.qlns
 app.json_encoder = CustomJSONEncoder
 
 app.register_blueprint(profile_blueprint, url_prefix="/profile")
+app.register_blueprint(category_blueprint, url_prefix="/danh-muc")
+app.register_blueprint(staff_blueprint, url_prefix="/nhan-vien")
 
 @app.route('/')
 def todo():
