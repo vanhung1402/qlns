@@ -1,11 +1,4 @@
 version: '3.6'
-# Deploys MongoDB with customization scripts and container with Mongo client
-# https://fabianlee.org/2018/05/20/docker-using-docker-compose-to-link-a-mongodb-server-and-client/
-#
-# usage:
-# sudo docker-compose build
-# sudo docker-compose up
-
 
 services:
   my-mongodb:
@@ -29,14 +22,14 @@ services:
   recruitment-api:
     container_name: recruitment-api
     build: 
-      context: ./api-server
+      context: ./recruitment-service
     depends_on:
       - my-mongodb
       - authenticate-api
     restart: always
     volumes:
-      - ./api-server:/usr/src/recruitment-api
-      - ./api-server/node_modules:/usr/src/recruitment-api/node_modules
+      - ./recruitment-service:/usr/src/recruitment-api
+      - ./recruitment-service/node_modules:/usr/src/recruitment-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - DB_NAME=qlns
@@ -50,14 +43,14 @@ services:
     container_name: staff-api
     command: python -u app.py
     build: 
-      context: ./staff-api
+      context: ./staff-service
     depends_on:
       - my-mongodb
       - authenticate-api
       - recruitment-api
     restart: always
     volumes:
-      - ./staff-api:/usr/src/staff-api
+      - ./staff-service:/usr/src/staff-api
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - DB_NAME=qlns
@@ -69,12 +62,12 @@ services:
   authenticate-api:
     container_name: authenticate-api
     build: 
-      context: ./authenticate-server
+      context: ./authenticate-service
     depends_on:
       - my-mongodb
     restart: always
     volumes:
-      - ./authenticate-server:/usr/src/authenticate-api
+      - ./authenticate-service:/usr/src/authenticate-api
       # - /usr/src/authenticate-api/node_modules
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
@@ -84,26 +77,27 @@ services:
     networks:
       - mongo_net
     
-  frontend-admin:
-    container_name: frontend-admin
+  admin-frontend:
+    container_name: admin-frontend
     build: 
-      context: ./tuyendung
+      context: ./admin-frontend
     depends_on:
       - recruitment-api
       - staff-api
       - authenticate-api
     restart: always
     volumes:
-      - ./tuyendung:/usr/src/frontend-admin
-      # - /usr/src/frontend-admin/node_modules
+      - ./admin-frontend:/usr/src/admin-frontend
     environment:
       - APP_PORT=8080
+      - RECRUITMENT_API_URL=http://recruitment-api:3000/
+      - AUTHENTICATE_API_URL=http://authenticate-api:3000/
+      - STAFF_API_URL=http://staff-api:3000/
     ports: 
       - '8080:8080'
     networks:
       - mongo_net
 volumes:
-  # default dir on Ubuntu: /var/lib/docker/volumes
   mongodb:
   mongoconfig:
   usr:
