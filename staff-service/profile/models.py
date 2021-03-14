@@ -16,7 +16,7 @@ class Profile:
         }
 
     def getList(self):
-        _accounts = app.db.Account.find({})
+        _accounts = app.db.tbl_taikhoan.find({})
         accounts = [account for account in _accounts]
         return jsonify(accounts)
 

@@ -21,32 +21,13 @@ class Staff:
 
   def getList(self):
     try:
-      _staffs = app.db.Staff.aggregate([
+      _staffs = app.db.tbl_nhanvien.aggregate([
         {
           '$lookup': {
             'from': 'WorkProcess',
             'localField': 'FK_iNhanvienID',
             'foreignField': 'PK_iNhanvienID',
             'as': 'WorkProcess',
-						'pipeline': [
-							{ "$match": { "$expr": { "$eq": [ "$_id", "$$FK_iNhanvienID" ] } } },
-							{
-								'$lookup': {
-									'from': 'JobPosition',
-									'let': {'FK_iVitriCongviecID': '$_id'},
-									'as': 'viTriCongViec',
-									"pipeline": [
-										{ "$match": { "$expr": { "$eq": [ "$_id", "$$industry_id" ] } } }
-									],
-								}
-							},
-							{
-								'$unwind': {
-									'path': "$JobPosition",
-									'preserveNullAndEmptyArrays': True
-								}
-							},
-						]
           }
         },
         {
@@ -63,7 +44,7 @@ class Staff:
     return jsonify(staffs)
 
   def getStaff(self, iNhanvienID):
-    staff = app.db.Staff.find_one({'PK_iNhanvienID': iNhanvienID})
+    staff = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': iNhanvienID})
     return staff
 
   def addNew(self):
@@ -80,7 +61,7 @@ class Staff:
         with open(staff['sDuongdanAnhdaidien'], 'wb') as f:
           f.write(avatarData)
 
-      newStaffId = app.db.Staff.save(staff)
+      newStaffId = app.db.tbl_nhanvien.save(staff)
       if newStaffId:
         workProcess['FK_iNhanvienID'] = newStaffId
         app.db.WorkProcess.save(workProcess)

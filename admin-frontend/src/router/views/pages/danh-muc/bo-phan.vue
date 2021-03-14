@@ -61,6 +61,40 @@ export default {
       }
       this.submitted = false
     },
+    handleSubmit(e) {
+      this.submitted = true
+      this.$v.form.$touch()
+      if (this.$v.form.$pending || this.$v.form.$error) return false
+      this.handleSave()
+    },
+    handleSave() {
+      let newBophan = {
+        PK_iBophanID: Date.now(),
+        sTenBophan: this.form.tenBoPhan,
+      }
+
+      this.$recruitment
+        .post('/api/cau-hinh/department', newBophan)
+        .then((res) => {
+          if (res.status === 200) {
+            this.$toastr.success(
+              'Thêm Bộ phận thành công.',
+              'Thành công'
+            )
+            this.loadlistDepartment()
+						this.handleResetForm()
+          } else {
+            this.$toastr.error(
+              'Đã có lỗi xảy ra khi Bộ phận.',
+              'Thất bại'
+            )
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          this.$toastr.error('Không thể thêm Bộ phận.', 'Thất bại')
+        })
+    },
   },
   validations: {
     form: {
@@ -134,6 +168,7 @@ export default {
               <thead>
                 <tr>
                   <th>STT</th>
+                  <th>Mã Bộ phận</th>
                   <th>Tên Bộ phận</th>
                   <th>Tác vụ</th>
                 </tr>
@@ -144,6 +179,7 @@ export default {
                   :key="department._id"
                 >
                   <td>{{ index + 1 }}</td>
+                  <td>{{ department.PK_iBophanID }}</td>
                   <td>{{ department.sTenBophan }}</td>
                   <td></td>
                 </tr>

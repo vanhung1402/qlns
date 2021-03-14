@@ -16,7 +16,7 @@ class Nation:
         }
 
     def getList(self):
-        _nations = app.db.Nation.find({})
+        _nations = app.db.dm_dantoc.find({})
         nations = [nation for nation in _nations]
         return jsonify(nations)
 
@@ -27,6 +27,6 @@ class Religion:
         }
 
     def getList(self):
-        _religions = app.db.Religion.find({})
+        _religions = app.db.dm_tongiao.find({})
         religions = [religion for religion in _religions]
         return jsonify(religions)
