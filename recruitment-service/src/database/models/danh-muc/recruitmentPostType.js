@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const recruitmentPostTypeSchema = mongoose.Schema({
+const dm_hinhthuc_dangtuyenSchema = mongoose.Schema({
     PK_iHinhthucDangtuyenID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const recruitmentPostTypeSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('RecruitmentPostType', recruitmentPostTypeSchema, 'RecruitmentPostType')
+module.exports = mongoose.model('dm_hinhthuc_dangtuyen', dm_hinhthuc_dangtuyenSchema, 'dm_hinhthuc_dangtuyen')

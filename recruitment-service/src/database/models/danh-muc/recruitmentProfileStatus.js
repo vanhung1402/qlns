@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const recruitmentProfileStatusSchema = mongoose.Schema({
+const dm_trangthai_hosoSchema = mongoose.Schema({
     PK_iTrangthaiHosoTuyendungID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const recruitmentProfileStatusSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('RecruitmentProfileStatus', recruitmentProfileStatusSchema, 'RecruitmentProfileStatus')
+module.exports = mongoose.model('dm_trangthai_hoso', dm_trangthai_hosoSchema, 'dm_trangthai_hoso')

@@ -1,4 +1,4 @@
-import Permission from '../../database/models/danh-muc/permission'
+import dm_quyen from '../../database/models/danh-muc/permission'
 
 exports.listPermission = (request, response) => {
     // let examples = [
@@ -12,7 +12,7 @@ exports.listPermission = (request, response) => {
     //     exn.save()
     // });
     let filter = request.body.filter
-    Permission.find(filter, (err, listPermission) => {
+    dm_quyen.find(filter, (err, listPermission) => {
         if (err)
             response.send(err)
         response.json(listPermission)

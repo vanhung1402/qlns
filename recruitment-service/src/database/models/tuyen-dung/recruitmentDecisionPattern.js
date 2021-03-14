@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const recruitmentDecisionPatternSchema = mongoose.Schema({
+const tbl_mau_quyetdinh_tuyendungSchema = mongoose.Schema({
     PK_iMauQuydinhTuyendungID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const recruitmentDecisionPatternSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('RecruitmentDecisionPattern', recruitmentDecisionPatternSchema, 'RecruitmentDecisionPattern')
+module.exports = mongoose.model('tbl_mau_quyetdinh_tuyendung', tbl_mau_quyetdinh_tuyendungSchema, 'tbl_mau_quyetdinh_tuyendung')

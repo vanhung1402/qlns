@@ -1,12 +1,12 @@
-# server
-/jwt-authenticate/node_modules
+#authenticate-service
+/authenticate-service/node_modules
 
-# server
-/authenticate-server/node_modules
+# recruitment-service
+/recruitment-service/node_modules
+/recruitment-service/logfile
 
-# api-server
-/api-server/node_modules
-/api-server/logfile
+# recruitment-service
+/mongo-db/mongodb
 
 # frontend
 # OS Files

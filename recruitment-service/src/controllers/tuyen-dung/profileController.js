@@ -1,6 +1,6 @@
-import RecruitmentProfile from '../../database/models/tuyen-dung/recruitmentProfile'
-import Staff from './../../database/models/nhan-vien/staff'
-import RecruitmentProfileStatus from '../../database/models/danh-muc/recruitmentProfileStatus'
+import tbl_hoso_tuyendung from '../../database/models/tuyen-dung/recruitmentProfile'
+import tbl_nhanvien from './../../database/models/nhan-vien/staff'
+import dm_trangthai_hoso from '../../database/models/danh-muc/recruitmentProfileStatus'
 
 exports.getList = (request, response) => {
 	let status = request.body.status
@@ -8,7 +8,7 @@ exports.getList = (request, response) => {
 	// if (status) {
 	// 	findCondition = { FK_iTrangthaiHosoID: status }
 	// }
-	RecruitmentProfile
+	tbl_hoso_tuyendung
 		.find(findCondition)
 		.populate({
 			path: 'FK_iChitietKehoachTuyendungID',
@@ -38,7 +38,7 @@ exports.getListWithStatus = (request, response) => {
 	let status = request.query.status
 
 
-	RecruitmentProfile
+	tbl_hoso_tuyendung
 		.find()
 		.populate({
 			path: 'FK_iChitietKehoachTuyendungID',
@@ -73,10 +73,10 @@ exports.getListWithStatus = (request, response) => {
 }
 
 exports.addNew = async (request, response) => {
-	const profileStatus = await RecruitmentProfileStatus.findOne({ PK_iTrangthaiHosoTuyendungID: 1 })
-	const createBy = await Staff.findOne({ PK_iNhanvienID: request.body.createBy })
+	const profileStatus = await dm_trangthai_hoso.findOne({ PK_iTrangthaiHosoTuyendungID: 1 })
+	const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: request.body.createBy })
 
-	const newProfile = new RecruitmentProfile({
+	const newProfile = new tbl_hoso_tuyendung({
 		PK_iHosoTuyendungID: request.body.profileId,
 		sHotenUngvien: request.body.fullName,
 		sTenUngvien: request.body.fullName,
@@ -106,7 +106,7 @@ exports.delete = (request, response) => {
 	if (request.params.profileId) {
 		deleteCondition._id = request.params.profileId
 	}
-	RecruitmentProfile.deleteOne(deleteCondition, (err, doc) => {
+	tbl_hoso_tuyendung.deleteOne(deleteCondition, (err, doc) => {
 		if (err) throw err
 		response.send(doc)
 	})
@@ -114,7 +114,7 @@ exports.delete = (request, response) => {
 
 exports.update = async (request, response) => {
 	const filter = { _id: request.params.profileId }
-	const updateBy = await Staff.findOne({ PK_iNhanvienID: request.body.params.updateBy }).exec()
+	const updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: request.body.params.updateBy }).exec()
 	let action = request.body.params.action
 	let update = { FK_iNguoiLuuID: updateBy, tThoigianLuu: Date.now() }
 
@@ -136,7 +136,7 @@ exports.update = async (request, response) => {
 			FK_iChitietKehoachTuyendungID: request.body.params.profileUpdate.planDetail,
 		}
 	} else if (action === 'updateStatus') {
-		const profileStatus = await RecruitmentProfileStatus.findOne({ PK_iTrangthaiHosoTuyendungID: request.body.params.status })
+		const profileStatus = await dm_trangthai_hoso.findOne({ PK_iTrangthaiHosoTuyendungID: request.body.params.status })
 		if (profileStatus) {
 			update = {
 				...update,
@@ -144,10 +144,10 @@ exports.update = async (request, response) => {
 			}
 		}
 	} else if (action === 'updateCandidateEvaluate') {
-		const profileStatus = await RecruitmentProfileStatus.findOne({ PK_iTrangthaiHosoTuyendungID: request.body.params.status })
+		const profileStatus = await dm_trangthai_hoso.findOne({ PK_iTrangthaiHosoTuyendungID: request.body.params.status })
 		update = { FK_iNguoiDanhgiaHosoID: updateBy, FK_iTrangthaiHosoTuyendungID: profileStatus, tThoigianDanhgiaHoso: Date.now(), sDanhgiaHoso: request.body.params.profileUpdate.result }
 	}
-	RecruitmentProfile.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
+	tbl_hoso_tuyendung.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
 		if (err) throw err
 		response.send(doc)
 	})

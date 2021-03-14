@@ -1,8 +1,8 @@
-import Department from '../../database/models/cau-hinh/department'
+import tbl_bophan from '../../database/models/cau-hinh/department'
 
 exports.listDepartment = (request, response) => {
     let filter = request.body.filter
-    Department.find(filter, (err, doc) => {
+    tbl_bophan.find(filter, (err, doc) => {
         if (err)
             response.send(err)
         response.json(doc.sort((a, b) => a - b))
@@ -10,7 +10,7 @@ exports.listDepartment = (request, response) => {
 }
 
 exports.addDepartment = (request, response) => {
-    let newDaparment = new Department(request.body)
+    let newDaparment = new tbl_bophan(request.body)
     newDaparment.save(function (err, doc) {
         if (err)
             response.send(err)

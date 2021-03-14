@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const nationSchema = mongoose.Schema({
+const dm_dantocSchema = mongoose.Schema({
     PK_iDantocID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const nationSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Nation', nationSchema, 'Nation')
+module.exports = mongoose.model('dm_dantoc', dm_dantocSchema, 'dm_dantoc')

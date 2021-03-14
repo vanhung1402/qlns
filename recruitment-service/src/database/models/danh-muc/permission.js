@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const permissionSchema = mongoose.Schema({
+const dm_quyenSchema = mongoose.Schema({
     PK_iQuyenID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const permissionSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Permission', permissionSchema, 'Permission')
+module.exports = mongoose.model('dm_quyen', dm_quyenSchema, 'dm_quyen')

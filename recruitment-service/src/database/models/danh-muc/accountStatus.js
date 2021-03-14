@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const accountStatusSchema = mongoose.Schema({
+const dm_trangthai_taikhoanSchema = mongoose.Schema({
     PK_iTrangthaiTaikhoanID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const accountStatusSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('AccountStatus', accountStatusSchema, 'AccountStatus')
+module.exports = mongoose.model('dm_trangthai_taikhoan', dm_trangthai_taikhoanSchema, 'dm_trangthai_taikhoan')

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
-const jobPositionSchema = mongoose.Schema({
+const tbl_vitri_congviecSchema = mongoose.Schema({
     PK_iVitriCongviecID: {
         type: Number,
         default: Date.now(),
@@ -13,7 +13,7 @@ const jobPositionSchema = mongoose.Schema({
         required: true,
     },
     FK_iBophanID: { 
-        type: Schema.Types.ObjectId, ref: 'Department',
+        type: Schema.Types.ObjectId, ref: 'tbl_bophan',
         required: true,
     },
     iThutuVitriCongviec: {
@@ -22,4 +22,4 @@ const jobPositionSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('JobPosition', jobPositionSchema, 'JobPosition')
+module.exports = mongoose.model('tbl_vitri_congviec', tbl_vitri_congviecSchema, 'tbl_vitri_congviec')

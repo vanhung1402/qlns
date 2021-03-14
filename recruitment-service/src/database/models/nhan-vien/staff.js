@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
-const staffSchema = mongoose.Schema({
+const tbl_nhanvienSchema = mongoose.Schema({
     PK_iNhanvienID: {
         type: Number,
         default: Date.now(),
@@ -70,10 +70,10 @@ const staffSchema = mongoose.Schema({
     sMasothue: {
         type: String,
     },
-    FK_iDantocID: { type: Schema.Types.ObjectId, ref: 'Nation' },
-    FK_iTongiaoID: { type: Schema.Types.ObjectId, ref: 'Religion' },
-    FK_iNguoithemID: { type: Schema.Types.ObjectId, ref: 'Staff', required: true },
-    FK_iNguoicapnhatID: { type: Schema.Types.ObjectId, ref: 'Staff' },
+    FK_iDantocID: { type: Schema.Types.ObjectId, ref: 'dm_dantoc' },
+    FK_iTongiaoID: { type: Schema.Types.ObjectId, ref: 'dm_tongiao' },
+    FK_iNguoithemID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true },
+    FK_iNguoicapnhatID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien' },
     sMotaBanthan: {
         type: String,
     },
@@ -85,4 +85,4 @@ const staffSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Staff', staffSchema, 'Staff')
+module.exports = mongoose.model('tbl_nhanvien', tbl_nhanvienSchema, 'tbl_nhanvien')

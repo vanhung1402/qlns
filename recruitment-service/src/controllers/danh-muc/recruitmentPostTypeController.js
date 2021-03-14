@@ -1,8 +1,8 @@
-import RecruitmentPostType from './../../database/models/danh-muc/recruitmentPostType'
+import dm_hinhthuc_dangtuyen from './../../database/models/danh-muc/recruitmentPostType'
 
 exports.listRecruitmentPostType = (request, response) => {
     let filter = request.body.filter
-    RecruitmentPostType
+    dm_hinhthuc_dangtuyen
         .find(filter)
         .exec((err, doc) => {
             if (err)
@@ -12,7 +12,7 @@ exports.listRecruitmentPostType = (request, response) => {
 }
 
 exports.addRecruitmentPostType = (request, response) => {
-    let newRecruitmentPostType = new RecruitmentPostType(request.body)
+    let newRecruitmentPostType = new dm_hinhthuc_dangtuyen(request.body)
     newRecruitmentPostType.save(function (err, doc) {
         if (err)
             response.send(err)

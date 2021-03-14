@@ -1,11 +1,11 @@
-import Staff from './../../database/models/nhan-vien/staff'
-import RecruitmentPost from '../../database/models/tuyen-dung/recruitmentPost'
+import tbl_nhanvien from './../../database/models/nhan-vien/staff'
+import tbl_bantin_tuyendung from '../../database/models/tuyen-dung/recruitmentPost'
 import { format as dateFormat } from 'date-fns'
 
 exports.addPost = async (request, response) => {
     const params = request.body
-    const createBy = await Staff.findOne({ PK_iNhanvienID: params.createBy }).exec()
-    const newPost = new RecruitmentPost({
+    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const newPost = new tbl_bantin_tuyendung({
         PK_iBantinTuyendungID: Date.now(),
         FK_iChitietKehoachTuyendungID: params.recruitmentPlanDetailSelected,
         sTieudeTinTuyendung: params.titleNews,
@@ -24,7 +24,7 @@ exports.addPost = async (request, response) => {
 exports.updatePost = async (request, response) => {
     const filter = { _id: request.params.postId }
     const params = request.body
-    const createBy = await Staff.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
     const updatePost = {
         FK_iChitietKehoachTuyendungID: params.recruitmentPlanDetailSelected,
         sTieudeTinTuyendung: params.titleNews,
@@ -34,7 +34,7 @@ exports.updatePost = async (request, response) => {
         tThoigianHethan: params.timeExpire,
     }
 
-    RecruitmentPost.findOneAndUpdate(filter, updatePost, {new: true}, (err, doc) => {
+    tbl_bantin_tuyendung.findOneAndUpdate(filter, updatePost, {new: true}, (err, doc) => {
         if (err) throw err
         response.json(doc)
     })
@@ -43,7 +43,7 @@ exports.updatePost = async (request, response) => {
 exports.listPost = (request, response) => {
     const filter = request.params.filter
 
-    RecruitmentPost
+    tbl_bantin_tuyendung
         .find(filter)
         .populate({
             path: 'FK_iChitietKehoachTuyendungID',

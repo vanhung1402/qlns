@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const religionSchema = mongoose.Schema({
+const dm_tongiaoSchema = mongoose.Schema({
     PK_iTongiaoID: {
         type: Number,
         default: Date.now(),
@@ -12,4 +12,4 @@ const religionSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Religion', religionSchema, 'Religion')
+module.exports = mongoose.model('dm_tongiao', dm_tongiaoSchema, 'dm_tongiao')

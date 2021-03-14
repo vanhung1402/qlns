@@ -1,11 +1,11 @@
-import RecruitmentProfileStatus from '../../database/models/danh-muc/recruitmentProfileStatus'
+import dm_trangthai_hoso from '../../database/models/danh-muc/recruitmentProfileStatus'
 
 exports.listRecruitmentProfileStatus = (request, response) => {
     const filter = {}
     if (request.query.status) {
         filter.PK_iTrangthaiHosoTuyendungID = { "$gt": request.query.status }
     }
-    RecruitmentProfileStatus
+    dm_trangthai_hoso
         .find(filter, (err, doc) => {
             if (err)
                 response.send(err)
@@ -14,7 +14,7 @@ exports.listRecruitmentProfileStatus = (request, response) => {
 }
 
 exports.addRecruitmentProfileStatus = (request, response) => {
-    let newRecruitmentProfileStatus = new RecruitmentProfileStatus(request.body)
+    let newRecruitmentProfileStatus = new dm_trangthai_hoso(request.body)
     newRecruitmentProfileStatus.save((err, doc) => {
         if (err)
             response.send(err)

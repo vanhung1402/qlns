@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 const Schema = mongoose.Schema
 
-const recruitmentPlanDetailSchema = mongoose.Schema({
+const tbl_chitiet_kehoach_tuyendungSchema = mongoose.Schema({
     PK_iChitietKehoachTuyendungID: {
         type: Number,
         default: Date.now(),
@@ -11,7 +11,7 @@ const recruitmentPlanDetailSchema = mongoose.Schema({
         type: Schema.Types.ObjectId, ref: 'RecruitmentPlan' 
     },
     FK_iVitriCongviecID: {
-        type: Schema.Types.ObjectId, ref: 'JobPosition' 
+        type: Schema.Types.ObjectId, ref: 'tbl_vitri_congviec' 
     },
     iSoluong: {
         type: Number,
@@ -49,7 +49,7 @@ const recruitmentPlanDetailSchema = mongoose.Schema({
         required: true,
     },
     FK_iHinhthucDangtuyenID: {
-        type: Schema.Types.ObjectId, ref: 'RecruitmentPostType' 
+        type: Schema.Types.ObjectId, ref: 'dm_hinhthuc_dangtuyen' 
     },
     iKinhphiDutruTuyendung: {
         type: Number,
@@ -57,4 +57,4 @@ const recruitmentPlanDetailSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('RecruitmentPlanDetail', recruitmentPlanDetailSchema, 'RecruitmentPlanDetail')
+module.exports = mongoose.model('tbl_chitiet_kehoach_tuyendung', tbl_chitiet_kehoach_tuyendungSchema, 'tbl_chitiet_kehoach_tuyendung')

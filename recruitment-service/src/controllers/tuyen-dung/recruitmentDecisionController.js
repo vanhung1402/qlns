@@ -1,12 +1,12 @@
-import RecruitmentDecisionPattern from '../../database/models/tuyen-dung/recruitmentDecisionPattern'
-import RecruitmentDecision from '../../database/models/tuyen-dung/recruitmentDecision'
-import RecruitmentDecisionStatus from '../../database/models/danh-muc/recruitmentDecisionStatus'
-import Staff from './../../database/models/nhan-vien/staff'
+import tbl_mau_quyetdinh_tuyendung from '../../database/models/tuyen-dung/recruitmentDecisionPattern'
+import tbl_quyetdinh_tuyendung from '../../database/models/tuyen-dung/recruitmentDecision'
+import dm_trangthai_quyetdinh_tuyendung from '../../database/models/danh-muc/recruitmentDecisionStatus'
+import tbl_nhanvien from './../../database/models/nhan-vien/staff'
 import { format as dateFormat } from 'date-fns'
 import { response } from 'express'
 
 exports.listDecisionPattern = (request, response) => {
-    RecruitmentDecisionPattern
+    tbl_mau_quyetdinh_tuyendung
         .find((err, doc) => {
             if (err) throw err
             response.json(doc.sort((a, b) => { a.PK_iMauQuydinhTuyendungID - b.PK_iMauQuydinhTuyendungID }))
@@ -14,7 +14,7 @@ exports.listDecisionPattern = (request, response) => {
 }
 
 exports.saveDecisionPattern = (request, response) => {
-    let newDecision = new RecruitmentDecisionPattern({
+    let newDecision = new tbl_mau_quyetdinh_tuyendung({
         PK_iMauQuydinhTuyendungID: request.body.decisionId || Date.now(),
         sNoidungMauQuyetdinhTuyendung: request.body.decisionContent || ''
     })
@@ -26,14 +26,14 @@ exports.saveDecisionPattern = (request, response) => {
 
 exports.saveDecision = async (request, response) => {
     let params = request.body
-    const createBy = await Staff.findOne({ PK_iNhanvienID: params.createBy }).exec()
-    const status = await RecruitmentDecisionStatus.findOne({ PK_iTrangthaiQuyetdinhTuyendungID: 1 }).exec()
+    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const status = await dm_trangthai_quyetdinh_tuyendung.findOne({ PK_iTrangthaiQuyetdinhTuyendungID: 1 }).exec()
 
     if (createBy) {
         if (Array.isArray(params.decision)) {
             let listNewDecision = []
             params.decision.forEach(async decision => {
-                let newCruitmentDecision = new RecruitmentDecision({
+                let newCruitmentDecision = new tbl_quyetdinh_tuyendung({
                     PK_iQuyetdinhTuyendungID: Date.now(),
                     sNoidungQuyetdinhTuyendung: decision.contentDecision,
                     FK_iNguoiLapQuyetdinhTuyendungID: createBy,
@@ -46,7 +46,7 @@ exports.saveDecision = async (request, response) => {
             });
             response.json(listNewDecision)
         } else {
-            let newCruitmentDecision = new RecruitmentDecision({
+            let newCruitmentDecision = new tbl_quyetdinh_tuyendung({
                 PK_iQuyetdinhTuyendungID: Date.now(),
                 sNoidungQuyetdinhTuyendung: params.decision.contentDecision,
                 FK_iNguoiLapQuyetdinhTuyendungID: createBy,
@@ -67,7 +67,7 @@ exports.saveDecision = async (request, response) => {
 
 exports.infoDecision = (request, response) => {
     let filter = { _id: request.params.decisionId }
-    RecruitmentDecision
+    tbl_quyetdinh_tuyendung
         .findOne(filter)
         .populate([
             {
@@ -116,7 +116,7 @@ exports.infoDecision = (request, response) => {
 }
 
 exports.listDecisions = (request, response) => {
-    RecruitmentDecision
+    tbl_quyetdinh_tuyendung
         .find()
         .populate([
             {
@@ -166,7 +166,7 @@ exports.listDecisions = (request, response) => {
 
 exports.updateDecision = async (request, response) => {
     let params = request.body
-    const updateBy = await Staff.findOne({ PK_iNhanvienID: params.updateBy }).exec()
+    const updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.updateBy }).exec()
     const filter = { _id: params.decisionUpdateId }
     let update = {
         FK_iNguoiLapQuyetdinhTuyendungID: updateBy,
@@ -179,7 +179,7 @@ exports.updateDecision = async (request, response) => {
                 update.sNoidungQuyetdinhTuyendung = params.contentDecision
             }
         } else if (params.action === 'updateStatus') {
-            const status = await RecruitmentDecisionStatus.findOne({ PK_iTrangthaiQuyetdinhTuyendungID: params.status }).exec()
+            const status = await dm_trangthai_quyetdinh_tuyendung.findOne({ PK_iTrangthaiQuyetdinhTuyendungID: params.status }).exec()
             if (status) {
                 update = {
                     FK_iNguoiDuyetQuyetdinhTuyendungID: updateBy,
@@ -190,7 +190,7 @@ exports.updateDecision = async (request, response) => {
             }
         }
 
-        RecruitmentDecision
+        tbl_quyetdinh_tuyendung
             .findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
                 if (err) throw err
                 response.json(doc)

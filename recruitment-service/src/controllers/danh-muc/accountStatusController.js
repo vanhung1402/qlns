@@ -1,4 +1,4 @@
-import AccountStatus from '../../database/models/danh-muc/accountStatus'
+import dm_trangthai_taikhoan from '../../database/models/danh-muc/accountStatus'
 
 exports.listAccountStatus = (request, response) => {
     // let example = [
@@ -11,7 +11,7 @@ exports.listAccountStatus = (request, response) => {
     //     accountStatusExample.save()
     // });
     let filter = request.body.filter
-    AccountStatus.find(filter, (err, listAccountStatus) => {
+    dm_trangthai_taikhoan.find(filter, (err, listAccountStatus) => {
         if (err)
             response.send(err)
         response.json(listAccountStatus)

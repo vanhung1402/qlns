@@ -39,19 +39,21 @@ export default {
       submitted: false,
     }
   },
-  created(){
+  created() {
     this.loadlistDepartment()
   },
   methods: {
     async loadlistDepartment() {
-      let promise = await this.$recruitment
-        .get('/api/cau-hinh/list-department')
+      await this.$recruitment
+        .get('api/cau-hinh/list-department')
+        .then((res) => {
+          if (res.status === 200) {
+            this.listDepartment = res.data
+          }
+        })
         .catch((err) => {
           console.error(err)
         })
-      if (promise.status === 200) {
-        this.listDepartment = promise.data
-      }
     },
     handleResetForm() {
       this.form = {
@@ -90,8 +92,7 @@ export default {
                   class="form-control"
                   autocomplete="off"
                   :class="{
-                    'is-invalid':
-                      submitted && $v.form.tenBoPhan.$error,
+                    'is-invalid': submitted && $v.form.tenBoPhan.$error,
                   }"
                   type="text"
                   placeholder="Tên Bộ phận"

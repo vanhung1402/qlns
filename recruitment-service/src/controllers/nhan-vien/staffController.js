@@ -1,6 +1,5 @@
-import Staff from '../../database/models/nhan-vien/staff'
+import tbl_nhanvien from '../../database/models/nhan-vien/staff'
 import { format as dateFormat, compareAsc } from 'date-fns'
-import WorkProcess from '../../database/models/nhan-vien/workProcess'
 
 exports.addExample = () => {
     let id = Date.now()
@@ -44,7 +43,7 @@ exports.addExample = () => {
             sCMND: '192736211',
         },
     ]
-    Staff.deleteMany({}).exec()
+    tbl_nhanvien.deleteMany({}).exec()
     example.forEach(staffExample => {
         let newStaff = new Staff(staffExample)
         newStaff.save()
@@ -53,7 +52,7 @@ exports.addExample = () => {
 
 exports.getList = (request, response) => {
     let filter = request.body.filter
-    Staff
+    tbl_nhanvien
         .find(filter)
         .populate({
             path: 'FK_iVitriCongviecID',

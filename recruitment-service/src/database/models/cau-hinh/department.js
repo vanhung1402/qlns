@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const departmentSchema = mongoose.Schema({
+const tbl_bophanSchema = mongoose.Schema({
     PK_iBophanID: {
         type: Number,
         default: Date.now(),
@@ -16,4 +16,4 @@ const departmentSchema = mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('Department', departmentSchema, 'Department')
+module.exports = mongoose.model('tbl_bophan', tbl_bophanSchema, 'tbl_bophan')

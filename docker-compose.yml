@@ -17,55 +17,15 @@ services:
     networks:
       - qlns_net
 
-  recruitment-api:
-    container_name: recruitment-api
-    build: 
-      context: ./recruitment-service
-    depends_on:
-      - my-mongodb
-      - authenticate-api
-    restart: always
-    volumes:
-      - ./recruitment-service:/usr/src/recruitment-api
-      - ./recruitment-service/node_modules:/usr/src/recruitment-api/node_modules
-    environment:
-      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
-      - DB_NAME=qlns
-      - APP_PORT=3001
-    ports: 
-      - '3001:3000'
-    networks:
-      - qlns_net
-    
-  staff-api:
-    container_name: staff-api
-    command: python -u app.py
-    build: 
-      context: ./staff-service
-    depends_on:
-      - my-mongodb
-      - authenticate-api
-      - recruitment-api
-    restart: always
-    volumes:
-      - ./staff-service:/usr/src/staff-api
-    environment:
-      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
-      - DB_NAME=qlns
-    ports: 
-      - '3003:3000'
-    networks:
-      - qlns_net
-
-  authenticate-api:
-    container_name: authenticate-api
+  authenticate-service:
+    container_name: authenticate-service
     build: 
       context: ./authenticate-service
     depends_on:
       - my-mongodb
     restart: always
     volumes:
-      - ./authenticate-service:/usr/src/authenticate-api
+      - ./authenticate-service:/usr/src/authenticate-service
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - APP_PORT=3002
@@ -74,22 +34,61 @@ services:
     networks:
       - qlns_net
     
+  recruitment-service:
+    container_name: recruitment-service
+    build: 
+      context: ./recruitment-service
+    depends_on:
+      - my-mongodb
+      - authenticate-service
+    restart: always
+    volumes:
+      - ./recruitment-service:/usr/src/recruitment-service
+    environment:
+      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - AUTHENTICATE_API_URL=http://authenticate-service:3000/
+      - DB_NAME=qlns
+      - APP_PORT=3001
+    ports: 
+      - '3001:3000'
+    networks:
+      - qlns_net
+    
+  staff-service:
+    container_name: staff-service
+    command: python -u app.py
+    build: 
+      context: ./staff-service
+    depends_on:
+      - my-mongodb
+      - authenticate-service
+    restart: always
+    volumes:
+      - ./staff-service:/usr/src/staff-service
+    environment:
+      - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - DB_NAME=qlns
+    ports: 
+      - '3003:3000'
+    networks:
+      - qlns_net
+
   admin-frontend:
     container_name: admin-frontend
     build: 
       context: ./admin-frontend
     depends_on:
-      - recruitment-api
-      - staff-api
-      - authenticate-api
+      - recruitment-service
+      - staff-service
+      - authenticate-service
     restart: always
     volumes:
       - ./admin-frontend:/usr/src/admin-frontend
     environment:
       - APP_PORT=8080
-      - RECRUITMENT_API_URL=http://recruitment-api:3000/
-      - AUTHENTICATE_API_URL=http://authenticate-api:3000/
-      - STAFF_API_URL=http://staff-api:3000/
+      - RECRUITMENT_API_URL=http://recruitment-service:3000/
+      - AUTHENTICATE_API_URL=http://authenticate-service:3000/
+      - STAFF_API_URL=http://staff-service:3000/
     ports: 
       - '8080:8080'
     networks:

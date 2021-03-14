@@ -1,14 +1,14 @@
-import RecruitmentPlan from '../../database/models/tuyen-dung/recruitmentPlan'
-import Staff from './../../database/models/nhan-vien/staff'
-import RecruitmentPlanStatus from './../../database/models/danh-muc/recruitmentPlanStatus'
-import RecruitmentPlanDetail from './../../database/models/tuyen-dung/recruitmentPlanDetail'
+import tbl_kehoach_tuyendung from '../../database/models/tuyen-dung/recruitmentPlan'
+import tbl_nhanvien from './../../database/models/nhan-vien/staff'
+import dm_trangthai_kehoach_tuyendung from './../../database/models/danh-muc/recruitmentPlanStatus'
+import tbl_chitiet_kehoach_tuyendung from './../../database/models/tuyen-dung/recruitmentPlanDetail'
 import { format as dateFormat } from 'date-fns'
 
 exports.addPlan = async (request, response) => {
     let params = request.body
-    let createBy = await Staff.findOne({ PK_iNhanvienID: params.createBy }).exec()
-    let status = await RecruitmentPlanStatus.findOne({ PK_iTrangthaiKehoachTuyendungID: 1 }).exec()
-    let newRecruitmentPlan = new RecruitmentPlan({
+    let createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    let status = await dm_trangthai_kehoach_tuyendung.findOne({ PK_iTrangthaiKehoachTuyendungID: 1 }).exec()
+    let newRecruitmentPlan = new tbl_kehoach_tuyendung({
         PK_iKehoachTuyendungID: Date.now(),
         sTieudeKehoach: params.title,
         sNoidungKehoach: params.content,
@@ -28,7 +28,7 @@ async function savePlanDetail(plan, listPlanDetail) {
     let newId = Date.now()
     let listSaved = []
     listPlanDetail.forEach(async (planDetail) => {
-        const newPlanDetail = new RecruitmentPlanDetail({
+        const newPlanDetail = new tbl_chitiet_kehoach_tuyendung({
             PK_iChitietKehoachTuyendungID: newId++,
             FK_iKehoachTuyendungID: plan,
             FK_iVitriCongviecID: planDetail.viTricongViec,
@@ -53,7 +53,7 @@ async function savePlanDetail(plan, listPlanDetail) {
 
 exports.getListPlanWithStatus = async (request, response) => {
     let { filter, statusId } = request.query
-    RecruitmentPlan
+    tbl_kehoach_tuyendung
         .find(filter)
         .populate('FK_iNguoilapKehoachID')
         .populate({
@@ -79,7 +79,7 @@ exports.getListPlanWithStatus = async (request, response) => {
 
 exports.getListPlan = async (request, response) => {
     let filter = request.body
-    RecruitmentPlan
+    tbl_kehoach_tuyendung
         .find(filter)
         .populate('FK_iNguoilapKehoachID')
         .populate('FK_iTrangthaiKehoachTuyendungID')
@@ -99,7 +99,7 @@ exports.getListPlan = async (request, response) => {
 
 exports.getListPlanDetailOfPlan = (request, response) => {
     let filter = request.query
-    RecruitmentPlanDetail
+    tbl_chitiet_kehoach_tuyendung
         .find(filter)
         .populate('FK_iVitriCongviecID')
         .populate('FK_iHinhthucDangtuyenID')
@@ -110,7 +110,7 @@ exports.getListPlanDetailOfPlan = (request, response) => {
 }
 
 async function getListPlanDetail(filter) {
-    return await RecruitmentPlanDetail
+    return await tbl_chitiet_kehoach_tuyendung
         .find(filter)
         .select('sTieudeKehoach sTenVitriCongviec')
         .populate('FK_iKehoachTuyendungID')
@@ -127,7 +127,7 @@ exports.updatePlan = async (request, response) => {
     let planId = request.params.planId
     let { action, params } = request.body
     const filter = { _id: planId }
-    let updateBy = await Staff.findOne({ PK_iNhanvienID: params.updateBy }).exec()
+    let updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.updateBy }).exec()
     if (!updateBy) {
         return false
     }
@@ -146,10 +146,10 @@ exports.updatePlan = async (request, response) => {
                 sNoidungKehoach: params.recruitmentPlan.content,
             }
         }
-        await RecruitmentPlanDetail.deleteMany({ FK_iKehoachTuyendungID: planId })
+        await tbl_chitiet_kehoach_tuyendung.deleteMany({ FK_iKehoachTuyendungID: planId })
         let newId = Date.now()
         params.recruitmentPlanDetail.forEach(async (planDetail) => {
-            const newPlanDetail = new RecruitmentPlanDetail({
+            const newPlanDetail = new tbl_chitiet_kehoach_tuyendung({
                 PK_iChitietKehoachTuyendungID: newId++,
                 FK_iKehoachTuyendungID: planId,
                 FK_iVitriCongviecID: planDetail.viTricongViec,
@@ -169,7 +169,7 @@ exports.updatePlan = async (request, response) => {
         });
         result = { status: 200, textStatus: 'OK' }
     } else if (action === 'change-status') {
-        let status = await RecruitmentPlanStatus.findOne({ PK_iTrangthaiKehoachTuyendungID: params.status }).exec()
+        let status = await dm_trangthai_kehoach_tuyendung.findOne({ PK_iTrangthaiKehoachTuyendungID: params.status }).exec()
         if (params.status === 2) {
             planUpdate = {
                 FK_iNguoiduyetKehoachID: updateBy,
@@ -188,7 +188,7 @@ exports.updatePlan = async (request, response) => {
             ...reason
         }
     }
-    await RecruitmentPlan.findOneAndUpdate(filter, planUpdate, { new: true }, (err, doc) => {
+    await tbl_kehoach_tuyendung.findOneAndUpdate(filter, planUpdate, { new: true }, (err, doc) => {
         if (err) throw err
         response.json(doc)
     })
@@ -196,7 +196,7 @@ exports.updatePlan = async (request, response) => {
 }
 
 exports.getPlanInfo = (request, response) => {
-    RecruitmentPlan
+    tbl_kehoach_tuyendung
         .findById(request.params.planId)
         .populate('FK_iNguoilapKehoachID')
         .populate('FK_iTrangthaiKehoachTuyendungID')
@@ -214,7 +214,7 @@ exports.getPlanInfo = (request, response) => {
 
 exports.getPlanDetailOfPlan = (request, response) => {
     let filter = { FK_iKehoachTuyendungID: request.params.planId }
-    RecruitmentPlanDetail
+    tbl_chitiet_kehoach_tuyendung
         .find(filter)
         .populate('FK_iVitriCongviecID')
         .populate('FK_iHinhthucDangtuyenID')
@@ -226,7 +226,7 @@ exports.getPlanDetailOfPlan = (request, response) => {
 
 exports.getPlanAvailable = (request, response) => {
     const filter = request.params.filter
-    RecruitmentPlan
+    tbl_kehoach_tuyendung
         .find(filter)
         .populate('FK_iTrangthaiKehoachTuyendungID')
         .select('sTieudeKehoach FK_iTrangthaiKehoachTuyendungID')

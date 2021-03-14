@@ -1,8 +1,8 @@
-import JobPosition from './../../database/models/cau-hinh/jobPosition'
+import tbl_vitri_congviec from './../../database/models/cau-hinh/jobPosition'
 
 exports.listJobPosition = (request, response) => {
     let filter = request.body.filter
-    JobPosition
+    tbl_vitri_congviec
         .find(filter)
         .populate('FK_iBophanID')
         .exec((err, doc) => {
@@ -13,7 +13,7 @@ exports.listJobPosition = (request, response) => {
 }
 
 exports.addJobPosition = (request, response) => {
-    let newDaparment = new JobPosition(request.body)
+    let newDaparment = new tbl_vitri_congviec(request.body)
     newDaparment.save(function (err, doc) {
         if (err)
             response.send(err)

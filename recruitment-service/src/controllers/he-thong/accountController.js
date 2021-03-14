@@ -1,9 +1,9 @@
-import Account from '../../database/models/he-thong/account'
-import AccountStatus from '../../database/models/danh-muc/accountStatus'
+import tbl_taikhoan from '../../database/models/he-thong/account'
+import dm_trangthai_taikhoan from '../../database/models/danh-muc/accountStatus'
 import { sha256 } from 'js-sha256'
 
 exports.addAccount = (request, response) => {
-    let newAccount = new Account({
+    let newAccount = new tbl_taikhoan({
         PK_iTaikhoanID: request.body.id,
         sTenTaikhoan: request.body.username,
         sMatkhau: sha256(request.body.password),
@@ -19,13 +19,8 @@ exports.addAccount = (request, response) => {
     })
 }
 exports.listAccount = (request, response) => {
-    // Account.deleteMany({}, (err, acc) => {
-    //     if (err)
-    //         response.send(err)
-    //     response.json(acc)
-    // })
     let filter = request.body.filter
-    Account
+    tbl_taikhoan
         .find(filter)
         .populate('FK_iTrangthaiTaikhoan')
         .populate('FK_iQuyenID')
@@ -40,7 +35,7 @@ exports.listAccount = (request, response) => {
 exports.changePassword = (request, response) => {
     const filter = { _id: request.params.accountId }
     const update = { sMatkhau: sha256(request.body.newPassword) }
-    Account.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
+    tbl_taikhoan.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
         if (err)
             response.send(err)
         response.json(doc)
@@ -50,7 +45,7 @@ exports.changePassword = (request, response) => {
 exports.changePermission = (request, response) => {
     const filter = { PK_iTaikhoanID: request.params.accountId }
     const update = { FK_iQuyenID: request.body.newPermission }
-    Account.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
+    tbl_taikhoan.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
         if (err)
             response.send(err)
         response.json(doc)
@@ -58,11 +53,11 @@ exports.changePermission = (request, response) => {
 }
 
 exports.changeStatus = async (request, response) => {
-    const statusAccount = await AccountStatus.findOne({ PK_iTrangthaiTaikhoanID: request.body.newStatus }).exec()
+    const statusAccount = await dm_trangthai_taikhoan.findOne({ PK_iTrangthaiTaikhoanID: request.body.newStatus }).exec()
     const filter = { _id: request.params.accountId }
     const update = { FK_iTrangthaiTaikhoan: statusAccount }
 
-    Account.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
+    tbl_taikhoan.findOneAndUpdate(filter, update, { new: true }, (err, doc) => {
         if (err)
             response.send(err)
         response.json(doc)
@@ -71,7 +66,7 @@ exports.changeStatus = async (request, response) => {
 
 exports.authenticate = (request, response) => {
     const filter = { sTenTaikhoan: request.body.username, sMatkhau: sha256(request.body.password) }
-    Account
+    tbl_taikhoan
         .findOne(filter)
         .populate('FK_iTrangthaiTaikhoan')
         .populate('FK_iQuyenID')
@@ -93,9 +88,9 @@ exports.authenticate = (request, response) => {
         })
 }
 
-exports.getAccount = async ({username, password}) => {
+exports.getAccount = async ({ username, password }) => {
     const filter = { sTenTaikhoan: username, sMatkhau: sha256(password) }
-    let doc = await Account
+    let doc = await tbl_taikhoan
         .findOne(filter)
         .populate('FK_iTrangthaiTaikhoan')
         .populate('FK_iQuyenID')
