@@ -24,7 +24,9 @@ export default {
     },
   },
 	methods: {
-		handleBtnEditProfileClick(){}
+		handleBtnEditProfileClick(){
+      this.$emit('handleBtnEditProfileClick', this.profile)
+    }
 	}
 }
 </script>
@@ -36,7 +38,7 @@ export default {
     <td class="text-center">{{
       new Date(profile.dNgaysinh) | date('dd/MM/yyyy')
     }}</td>
-		<td>{{ profile.WorkProcess.FK_iVitriCongviecID }}</td>
+		<td>{{ profile.quatrinh_lamviec.FK_iVitriCongviecID }}</td>
 		<td class="text-right">
       <btnTooltip
         :btn-id="'btn-edit-profile-' + index"

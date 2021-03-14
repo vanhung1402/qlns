@@ -9,6 +9,11 @@ export default {
       default: () => [],
     },
   },
+  methods: {
+    handleBtnEditProfileClick(profile){
+      this.$emit('handleBtnEditProfileClick', profile)
+    }
+  }
 }
 </script>
 
@@ -32,6 +37,7 @@ export default {
             :key="profile._id"
             :index="index + 1"
             :profile="profile"
+            @handleBtnEditProfileClick="handleBtnEditProfileClick"
           />
         </tbody>
       </table>

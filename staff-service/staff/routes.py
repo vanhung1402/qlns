@@ -13,6 +13,10 @@ def get():
 def addNew():
     return Staff().addNew()
 
+@staff_blueprint.route("/ho-so", methods=["PUT"])
+def updateStaff():
+    return Staff().updateStaff()
+
 @staff_blueprint.route("/danh-sach", methods=["GET"])
 def getList():
     return Staff().getList()

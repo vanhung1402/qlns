@@ -1,4 +1,5 @@
 import tbl_nhanvien from '../../database/models/nhan-vien/staff'
+import tbl_quatrinh_lamviec from '../../database/models/nhan-vien/workProcess'
 import { format as dateFormat, compareAsc } from 'date-fns'
 
 exports.addExample = () => {

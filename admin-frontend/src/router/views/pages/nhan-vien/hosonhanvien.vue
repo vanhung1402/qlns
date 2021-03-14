@@ -7,6 +7,7 @@ import StaffProfileList from '@components/nhan-vien/staffProfileList'
 import { required, email } from 'vuelidate/lib/validators'
 import Multiselect from 'vue-multiselect'
 import { VueEditor } from 'vue2-editor'
+import moment from 'moment'
 
 export default {
   page: {
@@ -71,6 +72,7 @@ export default {
         dNgayBatdau: '',
         dNgayKethuc: '',
       },
+      profileUpdateId: 0,
     }
   },
   created() {
@@ -141,22 +143,30 @@ export default {
         this.$v.formStaff.$pending ||
         this.$v.formStaff.$error ||
         !this.formStaff.FK_iDantocID ||
-        !this.formStaff.FK_iTongiaoID
+        !this.formStaff.FK_iTongiaoID ||
+        !this.checkAvailableDate(this.formStaff.dNgaysinh, new Date(), '<') ||
+        !this.checkAvailableDate(this.formStaff.dNgaycapCMND, new Date(), '<')
       )
         return false
       if (
         !this.isUpdate &&
-        (this.$v.formWorkProcess.$pending ||
-          this.$v.formWorkProcess.$error ||
-          !this.formWorkProcess.FK_iVitriCongviecID)
+        (!this.formWorkProcess.FK_iVitriCongviecID ||
+          !this.checkAvailableDate(this.formWorkProcess.dNgayBatdau) ||
+          (
+            this.formWorkProcess.dNgayKethuc &&
+            !this.checkAvailableDate(this.formWorkProcess.dNgayKethuc, new Date(), '>=')
+          )
+        )
       )
         return false
-      this.handleAddNewStaff()
+      if (this.isUpdate) {
+        this.handleUpdateStaff()
+      } else {
+        this.handleAddNewStaff()
+      }
     },
-    handleAddNewStaff() {
-      const newStaff = { ...this.formStaff }
-      newStaff.PK_iNhanvienID = Date.now()
-      newStaff.PK_iNguoithemID = this.$store.state.auth.currentUser.staff
+    getNewStaff() {
+      let newStaff = { ...this.formStaff }
       newStaff.FK_iDantocID = this.formStaff.FK_iDantocID._id
       newStaff.FK_iTongiaoID = this.formStaff.FK_iTongiaoID._id
       newStaff.sTen = this.getLastNameFromFullName(newStaff.sHoten)
@@ -166,6 +176,12 @@ export default {
       newStaff.dNgaycapCMND = new Date(
         this.convertDate(newStaff.dNgaycapCMND)
       ).toISOString()
+      return newStaff
+    },
+    handleAddNewStaff() {
+      let newStaff = this.getNewStaff()
+      newStaff.PK_iNhanvienID = Date.now()
+      newStaff.FK_iNguoithemID = this.$store.state.auth.currentUser.staff
 
       const staffWorkProcess = { ...this.formWorkProcess }
       staffWorkProcess.PK_iQuatrinhLamviecID = Date.now()
@@ -195,6 +211,22 @@ export default {
           console.error(err)
         })
     },
+    handleUpdateStaff() {
+      let newStaff = this.getNewStaff()
+      newStaff.FK_iNguoicapnhatID = this.$store.state.auth.currentUser.staff
+
+      this.$staff
+        .put('/nhan-vien/ho-so?id=' + this.profileUpdateId, {
+          staffData: newStaff,
+        })
+        .then((res) => {
+          console.log(res)
+          this.loadListStaffProfile()
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
     convertDate(date) {
       date = date.split('/')
       let newDate = [date[1], date[0], date[2]]
@@ -203,6 +235,32 @@ export default {
     getLastNameFromFullName(fullName) {
       fullName = fullName.replaceAll('  ', ' ').split(' ')
       return [...fullName].pop()
+    },
+    checkAvailableDate(dateString, dateCompare = null, condition = null) {
+      let newDate = this.convertDate(dateString)
+      newDate = new Date(newDate)
+
+      if (newDate instanceof Date && !isNaN(newDate)) {
+        if (dateCompare !== null) {
+          switch (condition) {
+            case '>':
+              return newDate > dateCompare
+            case '>=':
+              return newDate >= dateCompare
+            case '=':
+              return newDate === dateCompare
+            case '<':
+              return newDate < dateCompare
+            case '<=':
+              return newDate <= dateCompare
+            default:
+              return false
+          }
+        }
+        return true
+      }
+
+      return false
     },
     handleResetForm() {
       this.formStaff = {
@@ -233,26 +291,76 @@ export default {
         dNgayKethuc: '',
       }
 
+      this.isUpdate = false
       this.submitted = false
+    },
+    handleBtnEditProfileClick(profileEdit) {
+      this.isUpdate = true
+      console.log(profileEdit)
+      let {
+        sMaNhanvien,
+        sHoten,
+        dNgaysinh,
+        sNoisinh,
+        bGioitinh,
+        sNguyenquan,
+        sDiachi,
+        sDienthoai,
+        sEmail,
+        sCMND,
+        dNgaycapCMND,
+        sNoicapCMND,
+        sTrinhdoVanhoa,
+        sMasothue,
+        sMotaBanthan,
+        sDuongdanSoyeuLylich,
+        sDuongdanAnhdaidien,
+      } = profileEdit
+
+      this.formStaff = {
+        sMaNhanvien,
+        sHoten,
+        sNoisinh,
+        bGioitinh,
+        sNguyenquan,
+        sDiachi,
+        sDienthoai,
+        sEmail,
+        sCMND,
+        sNoicapCMND,
+        sTrinhdoVanhoa,
+        sMasothue,
+        sMotaBanthan,
+        sDuongdanSoyeuLylich,
+        sDuongdanAnhdaidien,
+      }
+      this.formStaff.dNgaysinh = moment(String(dNgaysinh)).format('DD/MM/YYYY')
+      this.formStaff.dNgaycapCMND = moment(String(dNgaycapCMND)).format(
+        'DD/MM/YYYY'
+      )
+      this.formStaff.FK_iDantocID = this.listNation.find((nation) => {
+        return nation._id === profileEdit.FK_iDantocID
+      })
+
+      this.formStaff.FK_iTongiaoID = this.listReligion.find((religion) => {
+        return religion._id === profileEdit.FK_iTongiaoID
+      })
+
+      this.profileUpdateId = profileEdit._id
     },
   },
   validations: {
     formStaff: {
       sMaNhanvien: { required },
       sHoten: { required },
-      dNgaysinh: { required },
       sNoisinh: { required },
       sNguyenquan: { required },
       sDiachi: { required },
       sDienthoai: { required },
       sEmail: { required, email },
       sCMND: { required },
-      dNgaycapCMND: { required },
       sNoicapCMND: { required },
       sTrinhdoVanhoa: { required },
-    },
-    formWorkProcess: {
-      dNgayBatdau: { required },
     },
   },
 }
@@ -264,6 +372,10 @@ export default {
 
     <div class="card">
       <div class="card-body">
+        <h4 class="text-center text-uppercase">{{
+          isUpdate ? 'Cập nhật nhân viên' : 'Thêm nhân viên'
+        }}</h4>
+        <hr />
         <form @submit.prevent="handleSubmit">
           <div class="row-flex">
             <div class="avatar-container">
@@ -331,14 +443,23 @@ export default {
                     type="text"
                     name="ngay-sinh"
                     :class="{
-                      'is-invalid': submitted && $v.formStaff.dNgaysinh.$error,
+                      'is-invalid':
+                        submitted &&
+                        !checkAvailableDate(
+                          formStaff.dNgaysinh,
+                          new Date(),
+                          '<'
+                        ),
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.formStaff.dNgaysinh.required"
+                    v-if="
+                      submitted &&
+                      !checkAvailableDate(formStaff.dNgaysinh, new Date(), '<')
+                    "
                     class="invalid-feedback"
-                    >Chưa nhập ngày sinh nhân viên</div
+                    >Ngày sinh không hợp lệ</div
                   >
                 </div>
                 <div class="col-lg-1 col-xl-2 form-group">
@@ -587,14 +708,18 @@ export default {
                   name="ngay-bat-dau-cong-viec"
                   :class="{
                     'is-invalid':
-                      submitted && $v.formWorkProcess.dNgayBatdau.$error,
+                      submitted &&
+                      !checkAvailableDate(formWorkProcess.dNgayBatdau),
                   }"
                   class="form-control"
                 />
                 <div
-                  v-if="submitted && !$v.formWorkProcess.dNgayBatdau.required"
+                  v-if="
+                    submitted &&
+                    !checkAvailableDate(formWorkProcess.dNgayBatdau)
+                  "
                   class="invalid-feedback"
-                  >Chưa nhập ngày bắt đầu công việc</div
+                  >Ngày bắt đầu công việc không hợp lệ</div
                 >
               </div>
               <div class="col-md-2 form-group">
@@ -607,7 +732,30 @@ export default {
                   type="text"
                   name="ngay-ket-thuc-cong-viec"
                   class="form-control"
+                  :class="{
+                    'is-invalid':
+                      submitted &&
+                      formWorkProcess.dNgayKethuc &&
+                      !checkAvailableDate(
+                        formWorkProcess.dNgayKethuc,
+                        new Date(),
+                        '>='
+                      ),
+                  }"
                 />
+                <div
+                  v-if="
+                    submitted &&
+                    formWorkProcess.dNgayKethuc &&
+                    !checkAvailableDate(
+                      formWorkProcess.dNgayKethuc,
+                      new Date(),
+                      '>='
+                    )
+                  "
+                  class="invalid-feedback"
+                  >Ngày kết thúc công việc không hợp lệ</div
+                >
               </div>
             </div>
           </div>
@@ -648,14 +796,26 @@ export default {
                     name="ngay-cap-cmnd"
                     :class="{
                       'is-invalid':
-                        submitted && $v.formStaff.dNgaycapCMND.$error,
+                        submitted &&
+                        !checkAvailableDate(
+                          formStaff.dNgaycapCMND,
+                          new Date(),
+                          '<'
+                        ),
                     }"
                     class="form-control"
                   />
                   <div
-                    v-if="submitted && !$v.formStaff.dNgaycapCMND.required"
+                    v-if="
+                      submitted &&
+                      !checkAvailableDate(
+                        formStaff.dNgaycapCMND,
+                        new Date(),
+                        '<'
+                      )
+                    "
                     class="invalid-feedback"
-                    >Chưa nhập ngày cấp CMND</div
+                    >Ngày cấp CMND không hợp lệ</div
                   >
                 </div>
                 <div class="col-md-12 form-group">
@@ -721,7 +881,8 @@ export default {
               ></vue-editor>
             </div>
           </div>
-          <div class="form-group text-center m-b-0">
+          <hr />
+          <div class="form-group text-center m-t-2 m-b-0">
             <button
               v-if="!isUpdate"
               class="btn btn-primary"
@@ -751,7 +912,10 @@ export default {
         </form>
       </div>
     </div>
-    <StaffProfileList :list-staff-profile="listStaffProfile" />
+    <StaffProfileList
+      :list-staff-profile="listStaffProfile"
+      @handleBtnEditProfileClick="handleBtnEditProfileClick"
+    />
   </Layout>
 </template>
 <style>
