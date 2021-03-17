@@ -26,6 +26,13 @@ export default {
 	methods: {
 		handleBtnEditProfileClick(){
       this.$emit('handleBtnEditProfileClick', this.profile)
+    },
+    handleBtnInfoProfileClick(data){
+      let routeData = this.$router.resolve({
+        name: 'StaffProfile',
+        params: { profileId: data._id },
+      })
+      window.open(routeData.href, '_blank')
     }
 	}
 }
@@ -38,7 +45,7 @@ export default {
     <td class="text-center">{{
       new Date(profile.dNgaysinh) | date('dd/MM/yyyy')
     }}</td>
-		<td>{{ profile.quatrinh_lamviec.FK_iVitriCongviecID }}</td>
+		<td>{{ profile.vitri ? profile.vitri.sTenVitriCongviec : '' }}</td>
 		<td class="text-right">
       <btnTooltip
         :btn-id="'btn-edit-profile-' + index"
@@ -49,20 +56,28 @@ export default {
         @onBtnClick="handleBtnEditProfileClick"
       />
       <btnTooltip
-        :btn-id="'btn-change-work-process-' + index"
-        :btn-type="'primary'"
-        :btn-data="profile"
-        :btn-tooltip-text="'Lịch sử công tác'"
-        :btn-icon="'uil uil-expand-arrows-alt'"
-        @onBtnClick="handleBtnEditProfileClick"
-      />
-      <btnTooltip
         :btn-id="'btn-hop-dong-lao-dong-' + index"
         :btn-type="'success'"
         :btn-data="profile"
         :btn-tooltip-text="'Hợp đồng lao động'"
         :btn-icon="'uil uil-notes'"
         @onBtnClick="handleBtnEditProfileClick"
+      />
+      <btnTooltip
+        :btn-id="'btn-change-work-process-' + index"
+        :btn-type="'warning'"
+        :btn-data="profile"
+        :btn-tooltip-text="'Lịch sử công tác'"
+        :btn-icon="'uil uil-expand-arrows-alt'"
+        @onBtnClick="handleBtnEditProfileClick"
+      />
+      <btnTooltip
+        :btn-id="'btn-profile-info-' + index"
+        :btn-type="'primary'"
+        :btn-data="profile"
+        :btn-tooltip-text="'Chi tiết hồ sơ'"
+        :btn-icon="'uil uil-info-circle'"
+        @onBtnClick="handleBtnInfoProfileClick"
       />
 		</td>
   </tr>

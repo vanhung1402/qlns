@@ -366,6 +366,22 @@ const employeeManagement = [
           lazyLoadView(import('@views/pages/nhan-vien/hosonhanvien')),
       },
       {
+        name: 'StaffProfile',
+        path: 'ho-so/:profileId',
+        hidden: 1,
+        meta: { title: 'Thông tin hồ sơ nhân viên', authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/nhan-vien/thongtinhoso')),
+      },
+      {
+        name: 'LaborContract',
+        path: 'hop-dong-lao-dong/:profileId',
+        hidden: 1,
+        meta: { title: 'Hợp đồng lao động', authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/nhan-vien/hodonglaodong')),
+      },
+      {
         name: 'Thuyên chuyển phòng ban',
         path: 'thuyen-chuyen-phong-ban',
         meta: { authRequired: true },

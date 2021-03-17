@@ -8,7 +8,7 @@ const tbl_chitiet_kehoach_tuyendungSchema = mongoose.Schema({
         unique: true
     },
     FK_iKehoachTuyendungID: {
-        type: Schema.Types.ObjectId, ref: 'RecruitmentPlan' 
+        type: Schema.Types.ObjectId, ref: 'tbl_kehoach_tuyendung' 
     },
     FK_iVitriCongviecID: {
         type: Schema.Types.ObjectId, ref: 'tbl_vitri_congviec' 

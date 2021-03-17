@@ -21,23 +21,47 @@ class Staff:
     }
 
   def getList(self):
+    pipeline = [
+      {
+        u"$project": {
+          u"_id": 0,
+          u"thongtin": u"$$ROOT"
+        }
+      }, 
+      {
+        u"$lookup": {
+          u"localField": u"thongtin._id",
+          u"from": u"tbl_quatrinh_lamviec",
+          u"foreignField": u"FK_iNhanvienID",
+          u"as": u"quatrinhlamviec"
+        }
+      }, 
+      {
+        u"$unwind": {
+          u"path": u"$quatrinhlamviec",
+          u"preserveNullAndEmptyArrays": True
+        }
+      }, 
+      {
+        u"$lookup": {
+          u"localField": u"quatrinhlamviec.FK_iVitriCongviecID",
+          u"from": u"tbl_vitri_congviec",
+          u"foreignField": u"_id",
+          u"as": u"vitri"
+        }
+      }, 
+      {
+        u"$unwind": {
+          u"path": u"$vitri",
+          u"preserveNullAndEmptyArrays": True
+        }
+      }
+    ]
     try:
-      _staffs = app.db.tbl_nhanvien.aggregate([
-        {
-          '$lookup': {
-            'from': 'tbl_quatrinh_lamviec',
-            'localField': 'FK_iNhanvienID',
-            'foreignField': 'PK_iNhanvienID',
-            'as': 'quatrinh_lamviec',
-          }
-        },
-        {
-          '$unwind': {
-            'path': "$tbl_quatrinh_lamviec",
-            'preserveNullAndEmptyArrays': True
-          }
-        },
-      ])
+      _staffs = app.db.tbl_nhanvien.aggregate(
+        pipeline, 
+        allowDiskUse = True
+      )
       staffs = [staff for staff in _staffs]
     except:
       print("Oops!", sys.exc_info(), "occurred.")
@@ -68,6 +92,7 @@ class Staff:
         newStaffId = app.db.tbl_nhanvien.save(staff)
         if newStaffId:
           workProcess['FK_iNhanvienID'] = newStaffId
+          workProcess['FK_iNguoiChuyenID'] = createBy['_id']
           app.db.tbl_quatrinh_lamviec.save(workProcess)
         return jsonify(newStaffId), 200
       else:
@@ -103,3 +128,15 @@ class Staff:
       print("Oops!", sys.exc_info(), "occurred.")
       return jsonify(sys.exc_info()), 500
     return jsonify({"message": "Lỗi không xác định"}), 500
+  
+  def getStaffWorkProcess(self):
+    staffId = request.args.get('nhan-vien')
+    work_process_filter = {}
+    work_process_filter['FK_iNhanvienID'] = ObjectId(staffId)
+    try:
+      _work_processes = app.db.tbl_quatrinh_lamviec.find(work_process_filter)
+      work_processes = [work_process for work_process in _work_processes]
+    except:
+      print("Oops!", sys.exc_info(), "occurred.")
+      return jsonify(sys.exc_info()), 500
+    return jsonify(work_processes)

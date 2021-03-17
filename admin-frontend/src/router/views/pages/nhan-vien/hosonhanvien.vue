@@ -86,9 +86,14 @@ export default {
       this.$staff
         .get('/nhan-vien/danh-sach')
         .then((res) => {
-          console.log(res.data)
           if (res.status === 200 && res.data) {
-            this.listStaffProfile = res.data
+            this.listStaffProfile = res.data.map((profile) => {
+              let pro = profile.thongtin 
+              pro.vitri = this.listJobPosition.find(job => {
+                return (profile.quatrinhlamviec && job._id === profile.quatrinhlamviec.FK_iVitriCongviecID)
+              })
+              return pro
+            })
           }
         })
         .catch((err) => {
@@ -152,11 +157,12 @@ export default {
         !this.isUpdate &&
         (!this.formWorkProcess.FK_iVitriCongviecID ||
           !this.checkAvailableDate(this.formWorkProcess.dNgayBatdau) ||
-          (
-            this.formWorkProcess.dNgayKethuc &&
-            !this.checkAvailableDate(this.formWorkProcess.dNgayKethuc, new Date(), '>=')
-          )
-        )
+          (this.formWorkProcess.dNgayKethuc &&
+            !this.checkAvailableDate(
+              this.formWorkProcess.dNgayKethuc,
+              new Date(),
+              '>='
+            )))
       )
         return false
       if (this.isUpdate) {
@@ -293,10 +299,11 @@ export default {
 
       this.isUpdate = false
       this.submitted = false
+      this.loadListStaffProfile()
     },
     handleBtnEditProfileClick(profileEdit) {
       this.isUpdate = true
-      console.log(profileEdit)
+      this.$refs.ma_nhan_vien.focus()
       let {
         sMaNhanvien,
         sHoten,
@@ -397,10 +404,12 @@ export default {
                   >
                   <input
                     id="ma-nhan-vien"
+                    ref="ma_nhan_vien"
                     v-model="formStaff.sMaNhanvien"
                     type="text"
                     class="form-control"
                     placeholder="VD: HC3006"
+                    autofocus="true"
                     :class="{
                       'is-invalid':
                         submitted && $v.formStaff.sMaNhanvien.$error,

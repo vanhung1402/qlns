@@ -21,4 +21,8 @@ def updateStaff():
 def getList():
     return Staff().getList()
 
+@staff_blueprint.route("/qua-trinh-lam-viec", methods=["GET"])
+def getStaffWorkProcess():
+    return Staff().getStaffWorkProcess()
+
 

@@ -4,7 +4,6 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import pdf from 'vue-pdf'
 
-
 export default {
   page: {
     title: 'Chi tiết hồ sơ ứng viên',
