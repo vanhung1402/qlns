@@ -299,7 +299,7 @@ export default {
 
       this.isUpdate = false
       this.submitted = false
-      this.loadListStaffProfile()
+      // this.loadListStaffProfile()
     },
     handleBtnEditProfileClick(profileEdit) {
       this.isUpdate = true

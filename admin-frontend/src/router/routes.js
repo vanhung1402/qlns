@@ -200,6 +200,13 @@ const categoryManagement = [
         component: () =>
           lazyLoadView(import('@views/pages/danh-muc/trang-thai-quyet-dinh-tuyen-dung')),
       },
+      {
+        name: 'Loại hợp đồng ',
+        path: 'loai-hop-dong',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/danh-muc/loai-hop-dong')),
+      },
     ]
   }
 ]
@@ -379,7 +386,7 @@ const employeeManagement = [
         hidden: 1,
         meta: { title: 'Hợp đồng lao động', authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/nhan-vien/hodonglaodong')),
+          lazyLoadView(import('@views/pages/nhan-vien/hopdonglaodong')),
       },
       {
         name: 'Thuyên chuyển phòng ban',

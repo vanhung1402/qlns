@@ -5,6 +5,8 @@ import RecruitmentPostType from './../controllers/danh-muc/recruitmentPostTypeCo
 import RecruitmentPlanStatus from './../controllers/danh-muc/recruitmentPlanStatusController'
 import RecruitmentProfileStatus from './../controllers/danh-muc/recruitmentProfileStatusController'
 import RecruitmentDecisionStatus from './../controllers/danh-muc/recruitmentDecisionStatusController'
+import LaborContractType from './../controllers/danh-muc/laborContractTypeController'
+import ContractTerm from './../controllers/danh-muc/contractTermController'
 
 const router = Router()
 
@@ -22,5 +24,11 @@ router.post('/recruitment-profile-status', RecruitmentProfileStatus.addRecruitme
 
 router.get('/list-recruitment-decision-status', RecruitmentDecisionStatus.listRecruitmentDecisionStatus)
 router.post('/recruitment-decision-status', RecruitmentDecisionStatus.addRecruitmentDecisionStatus)
+
+router.get('/list-labor-contract-type', LaborContractType.listLaborContractType)
+router.post('/labor-contract-type', LaborContractType.addLaborContractType)
+
+router.get('/list-contract-term', ContractTerm.listContractTerm)
+router.post('/contract-term', ContractTerm.addContractTerm)
 
 export default router
