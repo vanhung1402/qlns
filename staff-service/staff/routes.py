@@ -9,6 +9,10 @@ staff_blueprint = Blueprint("staff", __name__)
 def get():
     return 'staff'
 
+@staff_blueprint.route("/ho-so", methods=["GET"])
+def getHoSo():
+    return Staff().getHoSo()
+
 @staff_blueprint.route("/ho-so", methods=["POST"])
 def addNew():
     return Staff().addNew()

@@ -71,3 +71,24 @@ exports.getList = (request, response) => {
             response.json(listStaffFormat)
         })
 }
+
+exports.getListSignedBy = (request, response) => {
+    let filter = request.body.filter
+    tbl_nhanvien
+        .find(filter)
+        .populate({
+            path: 'FK_iVitriCongviecID',
+            select: 'sTenVitriCongviec FK_iBophanID',
+            populate: 'FK_iBophanID'
+        })
+        .exec(function (err, listStaff) {
+            if (err)
+                response.send(err)
+            let listStaffFormat = listStaff.map(staff => {
+                const formatStaff = JSON.parse(JSON.stringify(staff))
+                formatStaff.tNgaysinh = dateFormat(staff.dNgaysinh, 'dd/MM/yyyy')
+                return formatStaff
+            })
+            response.json(listStaffFormat)
+        })
+}

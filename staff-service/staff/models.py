@@ -140,3 +140,13 @@ class Staff:
       print("Oops!", sys.exc_info(), "occurred.")
       return jsonify(sys.exc_info()), 500
     return jsonify(work_processes)
+  
+  def getHoSo(self):
+    profileId = request.args.get('id')
+    profile_filter = {'_id': ObjectId(profileId)}
+    try:
+      profileData = app.db.tbl_nhanvien.find_one(profile_filter)
+    except:
+      print("Oops!", sys.exc_info(), "occurred.")
+      return jsonify(sys.exc_info()), 500
+    return jsonify(profileData)

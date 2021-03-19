@@ -33,6 +33,13 @@ export default {
         params: { profileId: data._id },
       })
       window.open(routeData.href, '_blank')
+    },
+    handleBtnLaborContractClick(data){
+      let routeData = this.$router.resolve({
+        name: 'LaborContract',
+        params: { profileId: data._id },
+      })
+      window.open(routeData.href, '_blank')
     }
 	}
 }
@@ -61,15 +68,7 @@ export default {
         :btn-data="profile"
         :btn-tooltip-text="'Hợp đồng lao động'"
         :btn-icon="'uil uil-notes'"
-        @onBtnClick="handleBtnEditProfileClick"
-      />
-      <btnTooltip
-        :btn-id="'btn-change-work-process-' + index"
-        :btn-type="'warning'"
-        :btn-data="profile"
-        :btn-tooltip-text="'Lịch sử công tác'"
-        :btn-icon="'uil uil-expand-arrows-alt'"
-        @onBtnClick="handleBtnEditProfileClick"
+        @onBtnClick="handleBtnLaborContractClick"
       />
       <btnTooltip
         :btn-id="'btn-profile-info-' + index"

@@ -19,7 +19,7 @@ const tbl_hopdong_laodongSchema = mongoose.Schema({
     },
     FK_iNhanvienID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true },
     FK_iLoaiHopdongID: { type: Schema.Types.ObjectId, ref: 'dm_loaihopdong', required: true },
-    FK_iThoihanHopdongID: { type: Schema.Types.ObjectId, ref: 'dm_thoihan_hopdong', required: true },
+    FK_iThoihanHopdongID: { type: Schema.Types.ObjectId, ref: 'dm_thoihan_hopdong' },
     dNgayKy: {
         type: Date,
         require: true,
@@ -41,6 +41,7 @@ const tbl_hopdong_laodongSchema = mongoose.Schema({
         default: 0,
     },
     FK_iNguoiKyID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true },
+    FK_iNguoiLapID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true },
     sGhichu: {
         type: String,
     },

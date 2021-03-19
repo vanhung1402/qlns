@@ -2,7 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
-// import moment from 'moment'
+import moment from 'moment'
 import { dateFilter } from 'vue-date-fns'
 import { required, minValue } from 'vuelidate/lib/validators'
 import Multiselect from 'vue-multiselect'
@@ -41,9 +41,14 @@ export default {
       btnSubmitTitle: 'Lập hợp đồng',
       iconBtnSubmit: 'plus',
       isUpdate: false,
+      isDisabledThoihan: false,
       submitted: false,
+      listJobPosition: {},
       listLaborContractType: [],
       listContractTerm: [],
+      listWorkProcess: [],
+      listSignedBy: [],
+      profile: {},
       datePicker: {
         enableTime: false,
         dateFormat: 'd/m/Y',
@@ -69,8 +74,63 @@ export default {
   created() {
     this.loadListLaborContractType()
     this.loadListContractTerm()
+    this.loadProfile()
+    this.loadWorkProcess()
+    this.loadListSignedBy()
   },
   methods: {
+    async loadWorkProcess() {
+      let promise = await this.$recruitment
+        .get('/api/cau-hinh/list-job-position')
+        .catch((err) => {
+          console.error(err)
+        })
+      let listJobPosition = {}
+      if (promise.status === 200 && promise.data) {
+        promise.data.forEach((job) => {
+          listJobPosition[job._id] = job
+        })
+        this.listJobPosition = listJobPosition
+      }
+      this.$staff
+        .get(
+          '/nhan-vien/qua-trinh-lam-viec?nhan-vien=' +
+            this.$router.currentRoute.params.profileId
+        )
+        .then((res) => {
+          if (res.status === 200 && res.data) {
+            this.listWorkProcess = res.data.map((work) => {
+              work.viTriCongViec =
+                listJobPosition[work.FK_iVitriCongviecID].sTenVitriCongviec +
+                ' - ' +
+                moment(String(work.dNgayBatdau)).format('DD/MM/YYYY') +
+                (work.dNgayKethuc
+                  ? ' - ' +
+                    moment(String(work.dNgayKethuc)).format('DD/MM/YYYY')
+                  : '')
+
+              return work
+            })
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
+    async loadProfile() {
+      this.$staff
+        .get(
+          '/nhan-vien/ho-so?id=' + this.$router.currentRoute.params.profileId
+        )
+        .then((res) => {
+          if (res.status === 200 && res.data) {
+            this.profile = res.data
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+        })
+    },
     async loadListLaborContractType() {
       let promise = await this.$recruitment
         .get('/api/danh-muc/list-labor-contract-type')
@@ -91,10 +151,40 @@ export default {
         this.listContractTerm = promise.data
       }
     },
+    loadListSignedBy() {
+      this.$recruitment
+        .get('/api/nhan-vien/list-signed-by')
+        .then((res) => {
+          let listSignedBy = res.data.map((staff) => {
+            staff.selectTitle = staff.sHoten + ' - ' + staff.chucVu
+            return staff
+          })
+          this.listSignedBy = listSignedBy
+        })
+        .catch((err) => {
+          console.error('Error: ', err)
+        })
+    },
     handleSubmit() {
       this.submitted = true
       this.$v.form.$touch()
-      if (this.$v.form.$pending || this.$v.form.$error) return false
+      if (
+        this.$v.form.$pending ||
+        this.$v.form.$error ||
+        !this.form.FK_iLoaiHopdongID ||
+        !this.form.FK_iQuatrinhLamviecID ||
+        !this.form.FK_iNguoiKyID
+      )
+        return false
+      if (this.isUpdate) {
+        this.handleUpdate()
+      } else {
+        this.handleAddNew()
+      }
+    },
+    handleAddNew() {
+      let newLaborContract = { ...this.form }
+      console.log(newLaborContract)
     },
     handleResetForm() {
       this.form = {
@@ -116,6 +206,52 @@ export default {
       this.submitted = false
       this.isUpdate = false
     },
+    onChangeLaborContractType() {
+      if (this.form.FK_iLoaiHopdongID.PK_iLoaiHopdongID === 1) {
+        this.isDisabledThoihan = true
+        this.form.dNgayHetHan = ''
+        this.form.FK_iThoihanHopdongID = null
+      } else {
+        this.isDisabledThoihan = false
+      }
+    },
+    convertDate(dateOld) {
+      let date = dateOld.split('/')
+      let newDate = [date[1], date[0], date[2]]
+      return newDate.join('/')
+    },
+    isValidDate(date) {
+      return date instanceof Date && !isNaN(date)
+    },
+    onChangeContractTerm() {
+      if (!this.form.FK_iThoihanHopdongID) return false
+      let ngayCoHieuLuc = new Date(
+        this.isValidDate(this.form.dNgayCoHieuluc)
+          ? this.form.dNgayCoHieuluc
+          : this.convertDate(this.form.dNgayCoHieuluc)
+      )
+      let ngayHetHan = new Date(ngayCoHieuLuc)
+      switch (this.form.FK_iThoihanHopdongID.sKieuThoihan) {
+        case 'month': {
+          ngayHetHan.setMonth(
+            ngayHetHan.getMonth() +
+              this.form.FK_iThoihanHopdongID.iGiatriThoihan
+          )
+          break
+        }
+        case 'year': {
+          ngayHetHan.setYear(
+            ngayHetHan.getYear() + this.form.FK_iThoihanHopdongID.iGiatriThoihan
+          )
+          break
+        }
+        default:
+          break
+      }
+      ngayHetHan.setDate(ngayHetHan.getDate() - 1)
+      console.log(this.$refs.ngay_het_han)
+      this.form.dNgayHetHan = ngayHetHan
+    },
   },
   validations: {
     form: {
@@ -123,8 +259,8 @@ export default {
       sSoHopdong: { required },
       dNgayKy: { required },
       dNgayCoHieuluc: { required },
-      iLuongCoban: { minValue: minValue(0) },
-      iLuongDongBaohiem: { minValue: minValue(0) },
+      iLuongCoban: { required, minValue: minValue(0) },
+      iLuongDongBaohiem: { required, minValue: minValue(0) },
     },
   },
 }
@@ -204,7 +340,7 @@ export default {
                 >Vui lòng chọn ngày ký hợp đồng</div
               >
             </div>
-            <div class="col-md-4 form-group">
+            <div class="col-md-5 form-group">
               <label for="loai-hop-dong">
                 Loại hợp đồng
                 <span class="text-danger">*</span>
@@ -218,6 +354,7 @@ export default {
                 placeholder="Chọn loại hợp đồng"
                 :show-labels="false"
                 :options="listLaborContractType"
+                @input="onChangeLaborContractType"
               ></multiselect>
               <div
                 class="invalid-feedback"
@@ -228,7 +365,7 @@ export default {
                 >Vui lòng chọn Loại hợp đồng.</div
               >
             </div>
-            <div class="col-md-4 form-group">
+            <div class="col-md-3 form-group">
               <label for="thoi-han-hop-dong">
                 Thời hạn hợp đồng
                 <span class="text-danger">*</span>
@@ -240,14 +377,18 @@ export default {
                 label="sTenThoihanHopdong"
                 track-by="_id"
                 placeholder="Chọn Thời hạn hợp đồng"
+                :disabled="isDisabledThoihan"
                 :show-labels="false"
                 :options="listContractTerm"
+                @input="onChangeContractTerm"
               ></multiselect>
               <div
                 class="invalid-feedback"
                 :class="{
                   'invalid-feedback invalid-feedback-select':
-                    submitted && !form.FK_iThoihanHopdongID,
+                    submitted &&
+                    !form.FK_iThoihanHopdongID &&
+                    !isDisabledThoihan,
                 }"
                 >Vui lòng chọn Thời hạn hợp đồng.</div
               >
@@ -265,6 +406,7 @@ export default {
                 :class="{
                   'is-invalid': submitted && $v.form.dNgayCoHieuluc.$error,
                 }"
+                @input="onChangeContractTerm"
               ></flat-pickr>
               <div
                 v-if="submitted && !$v.form.dNgayCoHieuluc.required"
@@ -276,14 +418,141 @@ export default {
               <label for="ngay-het-han">Ngày hết hạn</label>
               <flat-pickr
                 id="ngay-het-han"
+                ref="ngay_het_han"
                 v-model="form.dNgayHetHan"
                 :config="datePicker"
+                :disabled="isDisabledThoihan"
                 class="form-control"
-                placeholder="Chọn thời gian"
+                :placeholder="
+                  isDisabledThoihan ? 'Không khả dụng' : 'Chọn thời gian'
+                "
               ></flat-pickr>
             </div>
+            <div class="col-md-4 form-group">
+              <label>Họ và tên NLĐ</label>
+              <div class="form-control">
+                {{ profile.sHoten }}
+              </div>
+            </div>
+            <div class="col-md-2 form-group">
+              <label>Mã nhân viên</label>
+              <div class="form-control">
+                {{ profile.sMaNhanvien }}
+              </div>
+            </div>
+            <div class="col-md-6 form-group">
+              <label for="qua-trinh-lam-viec">
+                Vị trí công việc
+                <span class="text-danger">*</span>
+              </label>
+              <multiselect
+                id="qua-trinh-lam-viec"
+                v-model="form.FK_iQuatrinhLamviecID"
+                name="qua-trinh-lam-viec"
+                label="viTriCongViec"
+                track-by="_id"
+                placeholder="Chọn vị trí công việc"
+                :show-labels="false"
+                :options="listWorkProcess"
+              ></multiselect>
+              <div
+                class="invalid-feedback"
+                :class="{
+                  'invalid-feedback invalid-feedback-select':
+                    submitted && !form.FK_iQuatrinhLamviecID,
+                }"
+                >Vui lòng chọn Vị trí công việc.</div
+              >
+            </div>
+            <div class="col-md-3 form-group">
+              <label for="luong-co-ban"
+                >Lương cơ bản <span class="text-danger">*</span></label
+              >
+              <input
+                id="luong-co-ban"
+                v-model="form.iLuongCoban"
+                type="text"
+                class="form-control"
+                placeholder="VD: 10.000.000"
+                :class="{
+                  'is-invalid': submitted && $v.form.iLuongCoban.$error,
+                }"
+              />
+              <div
+                v-if="submitted && !$v.form.iLuongCoban.required"
+                class="invalid-feedback"
+                >Lương cơ bản không được bỏ trống</div
+              >
+              <div
+                v-if="submitted && !$v.form.iLuongCoban.minValue"
+                class="invalid-feedback"
+                >Lương cơ bản không hợp lệ</div
+              >
+            </div>
+            <div class="col-md-3 form-group">
+              <label for="luong-dong-bao-hiem"
+                >Lương đóng bảo hiểm <span class="text-danger">*</span></label
+              >
+              <input
+                id="luong-dong-bao-hiem"
+                v-model="form.iLuongDongBaohiem"
+                type="text"
+                class="form-control"
+                placeholder="VD: 5.000.000"
+                :class="{
+                  'is-invalid': submitted && $v.form.iLuongDongBaohiem.$error,
+                }"
+              />
+              <div
+                v-if="submitted && !$v.form.iLuongDongBaohiem.required"
+                class="invalid-feedback"
+                >Lương đóng BH không được bỏ trống</div
+              >
+              <div
+                v-if="submitted && !$v.form.iLuongDongBaohiem.minValue"
+                class="invalid-feedback"
+                >Lương đóng BH không hợp lệ</div
+              >
+            </div>
+            <div class="col-md-6 form-group">
+              <label for="nguoi-ky">
+                Người ký
+                <span class="text-danger">*</span>
+              </label>
+              <multiselect
+                id="nguoi-ky"
+                v-model="form.FK_iNguoiKyID"
+                name="nguoi-ky"
+                label="selectTitle"
+                track-by="_id"
+                placeholder="Chọn người ký"
+                :show-labels="false"
+                :options="listSignedBy"
+              ></multiselect>
+              <div
+                class="invalid-feedback"
+                :class="{
+                  'invalid-feedback invalid-feedback-select':
+                    submitted && !form.FK_iNguoiKyID,
+                }"
+                >Vui lòng chọn Người ký.</div
+              >
+            </div>
+            <div class="col-md-6 form-group">
+              <label for="ghi-chu">Ghi chú</label>
+              <input
+                id="ghi-chu"
+                type="text"
+                class="form-control"
+                placeholder="..."
+              />
+            </div>
+            <div class="col-md-6 form-group">
+              <label for="tep-dinh-kem">Tệp đính kèm</label>
+              <input id="tep-dinh-kem" type="file" class="form-control" />
+            </div>
           </div>
-          <div class="form-group text-center m-b-0">
+          <div class="form-group text-center mt-2">
             <button class="btn btn-primary" name="action" type="submit">
               <i :class="'uil uil-' + iconBtnSubmit"></i>
               {{ btnSubmitTitle }}</button
