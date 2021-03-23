@@ -25,8 +25,20 @@ def updateStaff():
 def getList():
     return Staff().getList()
 
+@staff_blueprint.route("/qua-trinh-lam-viec", methods=["POST"])
+def addStaffWorkProcess():
+    return Staff().addStaffWorkProcess()
+    
 @staff_blueprint.route("/qua-trinh-lam-viec", methods=["GET"])
 def getStaffWorkProcess():
     return Staff().getStaffWorkProcess()
+
+@staff_blueprint.route("/hop-dong", methods=["GET"])
+def getListLaborContract():
+    return Staff().getListLaborContract()
+
+@staff_blueprint.route("/hop-dong", methods=["POST"])
+def addLaborContract():
+    return Staff().addLaborContract()
 
 

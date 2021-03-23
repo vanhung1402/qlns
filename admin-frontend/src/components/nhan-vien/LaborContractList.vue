@@ -1,17 +1,26 @@
 <script>
 import btnTooltip from '@components/button-tooltip'
-import { dateFilter } from 'vue-date-fns'
+import moment from 'moment'
 
 export default {
   components: { btnTooltip },
   filters: {
-    date: dateFilter,
+    momentVNDate: function (date) {
+      return moment(date).format('DD/MM/YYYY')
+    },
+    momentENDate: function (date) {
+      return moment(date).format('YYYY/MM/DD')
+    },
   },
   props: {
     listLaborContract: {
       type: Array,
       default: () => [],
     },
+    isShowAddBtn: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -28,8 +37,12 @@ export default {
         .catch((err) => {
           console.error(err)
         })
-      if (promise.status === 200) {
-        this.listJobPosition = promise.data
+      let listJobPosition = {}
+      if (promise.status === 200 && promise.data) {
+        promise.data.forEach((job) => {
+          listJobPosition[job._id] = job
+        })
+        this.listJobPosition = listJobPosition
       }
     },
     handleBtnInfoLaborContractClick() {},
@@ -39,6 +52,9 @@ export default {
         params: { profileId: this.$router.currentRoute.params.profileId },
       })
       window.open(routeData.href, '_blank')
+    },
+    getJobPosition(id){
+      return this.listJobPosition[id] ? this.listJobPosition[id].sTenVitriCongviec : ''
     },
   },
 }
@@ -59,6 +75,7 @@ export default {
               <th>Vị trí công việc</th>
               <th>Ngày có hiệu lực</th>
               <th>Ngày hết hiệu lực</th>
+              <th>Tác vụ</th>
             </tr>
           </thead>
           <tbody>
@@ -66,12 +83,13 @@ export default {
               v-for="(laborContract, index) in listLaborContract"
               :key="index"
             >
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>
+              <td class="text-center">{{ index + 1 }}</td>
+              <td>{{ laborContract.sSoHopdong }}</td>
+              <td>{{ laborContract.sTenHopdong }}</td>
+              <td>{{ getJobPosition(laborContract.FK_iQuatrinhLamviecID.FK_iVitriCongviecID) }}</td>
+              <td>{{ laborContract.dNgayCoHieuluc | momentVNDate }}</td>
+              <td>{{ laborContract.dNgayHetHan | momentVNDate }}</td>
+              <td class="text-right">
                 <btnTooltip
                   :btn-id="'btn-labor-contract-info-' + index"
                   :btn-type="'info'"
@@ -83,9 +101,9 @@ export default {
               </td>
             </tr>
           </tbody>
-					<tfoot>
-						<tr>
-							<th colspan="7" class="text-right">
+          <tfoot v-if="isShowAddBtn">
+            <tr>
+              <th colspan="7" class="text-right">
                 <btnTooltip
                   :btn-id="'btn-add-labor-contract-'"
                   :btn-type="'primary'"
@@ -93,9 +111,9 @@ export default {
                   :btn-icon="'uil uil-plus'"
                   @onBtnClick="handleBtnAddLaborContractClick"
                 />
-							</th>
-						</tr>
-					</tfoot>
+              </th>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

@@ -381,26 +381,20 @@ const employeeManagement = [
           lazyLoadView(import('@views/pages/nhan-vien/thongtinhoso')),
       },
       {
+        name: 'WorkProcess',
+        path: 'qua-trinh-lam-viec/:profileId',
+        hidden: 1,
+        meta: { title: 'Quá trình làm việc', authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/nhan-vien/quatrinhlamviec')),
+      },
+      {
         name: 'LaborContract',
         path: 'hop-dong-lao-dong/:profileId',
         hidden: 1,
         meta: { title: 'Hợp đồng lao động', authRequired: true },
         component: () =>
           lazyLoadView(import('@views/pages/nhan-vien/hopdonglaodong')),
-      },
-      {
-        name: 'Thuyên chuyển phòng ban',
-        path: 'thuyen-chuyen-phong-ban',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/email/reademail')),
-      },
-      {
-        name: 'Thăng chức, giáng chức',
-        path: 'thang-chuc-giang-chuc',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/email/reademail')),
       },
       {
         name: 'Hợp đồng lao động',
@@ -705,11 +699,11 @@ const formsRoutes = [
 ]
 
 // tables
-const tablesRoutes = [
+const quanLyChamCong = [
   {
     path: '/tables',
-    name: 'Tables',
-    icon: 'grid',
+    name: 'Quản lý chấm công',
+    icon: 'calendar',
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -720,16 +714,93 @@ const tablesRoutes = [
     children: [
       {
         path: 'basic',
-        name: 'Basic Tables',
+        name: 'Thiết lập thời gian làm việc',
         component: () =>
           lazyLoadView(import('@views/pages/ui/tables/basic-table')),
       },
       {
         path: 'advanced',
-        name: 'Advanced Tables',
+        name: 'Thời gian nghỉ lễ, tết',
         component: () =>
           lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
       },
+      {
+        path: 'advanced1',
+        name: 'DS đơn xin nghỉ phép',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+      {
+        path: 'advanced2',
+        name: 'Lập đơn xin nghỉ phép',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+      {
+        path: 'advanced3',
+        name: 'Lập bảng chấm công',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+    ],
+  },
+]
+
+const quanLyLT = [
+  {
+    path: '/tables',
+    name: 'Lương thưởng & phúc lợi',
+    icon: 'calendar',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    children: [
+      {
+        path: 'basic',
+        name: 'Lương cơ bản',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/basic-table')),
+      },
+      {
+        path: 'advanced',
+        name: 'Thiết lập mức thưởng phạt',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+      {
+        path: 'advanced1',
+        name: 'Tính lương',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+      {
+        path: 'advanced2',
+        name: 'Thống kê lương',
+        component: () =>
+          lazyLoadView(import('@views/pages/ui/tables/advanced-table')),
+      },
+    ],
+  },
+]
+
+const quanLyCongViec = [
+  {
+    path: '/tables',
+    name: 'Quản lý công việc',
+    icon: 'calendar',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    children: [
+      
     ],
   },
 ]
@@ -753,13 +824,15 @@ const authProtectedRoutes = [
   ...systemManagement,
   ...recruitmentManagement,
   ...employeeManagement,
+  ...quanLyChamCong,
+  ...quanLyLT,
+  ...quanLyCongViec,
   ...dashboardRoutes,
   ...appsRoutes,
   ...pagesRoutes,
   ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
-  ...tablesRoutes
 ]
 const allRoutes = [...authRoutes, ...authProtectedRoutes, ...errorPagesRoutes]
 

@@ -21,6 +21,17 @@ export default {
   data() {
     return {
       listJobPosition: [],
+      dNgayKethucConfig: {
+        enableTime: false,
+        dateFormat: 'd/m/Y',
+        minDate: new Date(),
+      },
+      submitted: false,
+      workProcessChange: {},
+      form: {
+        dNgayKethuc: new Date(),
+        sGhichu: '',
+      },
     }
   },
   created() {
@@ -44,8 +55,80 @@ export default {
         })
     },
     handleBtnAddLaborContractClick() {},
-    handleBtnEndLaborContractClick() {},
-		handleBtnAddWorkProcessClick() {},
+    handleBtnEndLaborContractClick(workProcess) {
+      let dNgayBatdau = new Date(workProcess.dNgayBatdau)
+      this.dNgayKethucConfig.minDate = dNgayBatdau.setDate(
+        dNgayBatdau.getDate() + 1
+      )
+      this.dNgayKethucConfig.minDate = new Date(this.dNgayKethucConfig.minDate).setHours(0, 0, 0, 0)
+      this.workProcessChange = workProcess
+    },
+    handleBtnAddWorkProcessClick() {
+      let routeData = this.$router.resolve({
+        name: 'WorkProcess',
+        params: { profileId: this.$router.currentRoute.params.profileId },
+      })
+      window.open(routeData.href, '_blank')
+    },
+    handleResetForm() {
+      this.form = {
+        dNgayKethuc: new Date(),
+        sGhichu: '',
+      }
+      this.submitted = false
+    },
+    handleSubmit(){
+      this.submitted = true
+      if (!this.checkAvailableDate(this.form.dNgayKethuc, this.dNgayKethucConfig.minDate, '>=')) return false
+      if (!this.isValidDate(new Date(this.form.dNgayKethuc))){
+        this.form.dNgayKethuc = new Date(this.convertDate(this.form.dNgayKethuc))
+      }
+      this.handleCheckoutWorkProcess()
+    },
+    handleCheckoutWorkProcess() {
+      let checkOut = {...this.form}
+      if (!this.isValidDate(checkOut.dNgayKethuc)){
+        checkOut.dNgayKethuc = this.convertDate(checkOut.dNgayKethuc)
+      }
+      checkOut.dNgayKethuc = new Date(checkOut.dNgayKethuc)
+      
+    },
+    isValidDate(date) {
+      return date instanceof Date && !isNaN(date)
+    },
+    convertDate(dateOld) {
+      let date = dateOld.split('/')
+      let newDate = [date[1], date[0], date[2]]
+      return newDate.join('/')
+    },
+    checkAvailableDate(dateString, dateCompare = null, condition = null) {
+      let newDate = this.isValidDate(dateString)
+        ? dateString
+        : this.convertDate(dateString)
+      newDate = new Date(newDate)
+
+      if (newDate instanceof Date && !isNaN(newDate)) {
+        if (dateCompare !== null) {
+          switch (condition) {
+            case '>':
+              return newDate > dateCompare
+            case '>=':
+              return newDate >= dateCompare
+            case '=':
+              return newDate === dateCompare
+            case '<':
+              return newDate < dateCompare
+            case '<=':
+              return newDate <= dateCompare
+            default:
+              return false
+          }
+        }
+        return true
+      }
+
+      return false
+    },
   },
 }
 </script>
@@ -103,6 +186,7 @@ export default {
                 />
                 <btnTooltip
                   v-if="workProcess.dNgayKethuc === ''"
+                  v-b-modal.modal-sm
                   :btn-id="'btn-labor-contract-end-' + index"
                   :btn-type="'warning'"
                   :btn-data="workProcess"
@@ -113,9 +197,9 @@ export default {
               </td>
             </tr>
           </tbody>
-					<tfoot>
-						<tr>
-							<th colspan="6" class="text-right">
+          <tfoot>
+            <tr>
+              <th colspan="6" class="text-right">
                 <btnTooltip
                   :btn-id="'btn-add-work-process-'"
                   :btn-type="'primary'"
@@ -123,11 +207,68 @@ export default {
                   :btn-icon="'uil uil-plus'"
                   @onBtnClick="handleBtnAddWorkProcessClick"
                 />
-							</th>
-						</tr>
-					</tfoot>
+              </th>
+            </tr>
+          </tfoot>
         </table>
       </div>
+      <b-modal
+        id="modal-sm"
+        size="sm"
+        title="Kết thúc vị trí công việc"
+        title-class="font-18"
+        hide-footer
+      >
+        <form @submit.prevent="handleSubmit">
+          <div class="form-group">
+            <label for="ngay-ket-thuc-cong-viec"
+              >Ngày kết thúc <span class="text-danger">*</span></label
+            >
+            <flat-pickr
+              id="ngay-ket-thuc-cong-viec"
+              v-model="form.dNgayKethuc"
+              :config="dNgayKethucConfig"
+              class="form-control"
+              placeholder="dd/mm/yyyy"
+              :class="{
+                'is-invalid':
+                  submitted && !checkAvailableDate(form.dNgayKethuc, dNgayKethucConfig.minDate, '>='),
+              }"
+            ></flat-pickr>
+            <div
+              v-if="submitted && !checkAvailableDate(form.dNgayKethuc, dNgayKethucConfig.minDate, '>=')"
+              class="invalid-feedback"
+              >Ngày kết thúc công việc không hợp lệ</div
+            >
+          </div>
+          <div class="form-group">
+            <label for="ghi-chu">Ghi chú:</label>
+            <textarea
+              id="ghi-chu"
+              rows="5"
+              class="form-control"
+              placeholder="VD: Hết nhiệm kỳ..."
+            ></textarea>
+          </div>
+          <div class="form-group text-center m-b-0">
+            <button
+              class="btn btn-primary"
+              name="action"
+              value="them-chi-tiet"
+              type="submit"
+            >
+              <i class="uil uil-check"></i> Xác nhận</button
+            >
+            <button
+              type="reset"
+              class="btn btn-secondary m-l-5 ml-1"
+              @click="handleResetForm"
+            >
+              <i class="uil uil-multiply"></i> Hủy</button
+            >
+          </div>
+        </form>
+      </b-modal>
     </div>
   </div>
 </template>
@@ -141,5 +282,8 @@ table.table tr td {
 }
 td.btn-action {
   min-width: 120px;
+}
+.invalid-feedback.invalid-feedback-select {
+  display: block;
 }
 </style>

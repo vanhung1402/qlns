@@ -108,6 +108,13 @@ export default {
       this.handleSavePost()
     },
     handleSavePost() {
+      let post = {...this.form}
+      let ngayDang = post.timeExpire
+      ngayDang = ngayDang.split(' ')
+      let mangNgay = ngayDang[0].split('/')
+      mangNgay = [mangNgay[1], mangNgay[0], mangNgay[2]].join('/')
+      ngayDang = [mangNgay, ngayDang[1]].join(' ')
+      this.form.timeExpire = new Date(ngayDang)
       let newPost = {
         ...this.form,
         ...{ createBy: this.$store.state.auth.currentUser.staff },
@@ -178,7 +185,10 @@ export default {
           )
           .then((res) => {
             if (res.status === 200) {
-              this.renderRecruitmentPlanDetail(res.data)
+              console.log(res.data)
+              this.renderRecruitmentPlanDetail(res.data.filter(rpd => {
+                return rpd.FK_iHinhthucDangtuyenID.sTenHinhthucDangtuyen === 'Trang tuyển dụng'
+              }))
             }
           })
           .catch((err) => {

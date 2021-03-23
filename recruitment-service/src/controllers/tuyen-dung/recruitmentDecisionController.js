@@ -104,10 +104,10 @@ exports.infoDecision = (request, response) => {
             if (err) throw err
             let decisionFormat = JSON.parse(JSON.stringify(doc))
             if (doc) {
-                let thoiGianDuyet = doc.tThoigianDuyetQuyetdinhTuyendung ? dateFormat(doc.tThoigianDuyetQuyetdinhTuyendung, 'dd/MM/yyyy HH:mm:i') : ''
+                let thoiGianDuyet = doc.tThoigianDuyetQuyetdinhTuyendung ? dateFormat(doc.tThoigianDuyetQuyetdinhTuyendung.setHours(doc.tThoigianDuyetQuyetdinhTuyendung.getHours() + 7), 'dd/MM/yyyy HH:mm:i') : ''
                 decisionFormat = {
                     ...decisionFormat,
-                    txtThoigianLapQuyetdinhTuyendung: dateFormat(doc.tThoigianLapQuyetdinhTuyendung, 'dd/MM/yyyy HH:mm:i'),
+                    txtThoigianLapQuyetdinhTuyendung: dateFormat(doc.tThoigianLapQuyetdinhTuyendung.setHours(doc.tThoigianLapQuyetdinhTuyendung.getHours() + 7), 'dd/MM/yyyy HH:mm:i'),
                     txtThoigianDuyetQuyetdinhTuyendung: thoiGianDuyet,
                 }
             }
@@ -153,11 +153,11 @@ exports.listDecisions = (request, response) => {
         .exec((err, doc) => {
             if (err) throw err
             response.json(doc.map(decision => {
-                let thoiGianDuyet = decision.tThoigianDuyetQuyetdinhTuyendung ? dateFormat(decision.tThoigianDuyetQuyetdinhTuyendung, 'dd/MM/yyyy HH:mm:i') : ''
+                let thoiGianDuyet = decision.tThoigianDuyetQuyetdinhTuyendung ? dateFormat(decision.tThoigianDuyetQuyetdinhTuyendung.setHours(decision.tThoigianDuyetQuyetdinhTuyendung.getHours() + 7), 'dd/MM/yyyy HH:mm:i') : ''
                 let decisionFormat = JSON.parse(JSON.stringify(decision))
                 return {
                     ...decisionFormat,
-                    txtThoigianLapQuyetdinhTuyendung: dateFormat(decision.tThoigianLapQuyetdinhTuyendung, 'dd/MM/yyyy HH:mm:i'),
+                    txtThoigianLapQuyetdinhTuyendung: dateFormat(decision.tThoigianLapQuyetdinhTuyendung.setHours(decision.tThoigianLapQuyetdinhTuyendung.getHours() + 7), 'dd/MM/yyyy HH:mm:i'),
                     txtThoigianDuyetQuyetdinhTuyendung: thoiGianDuyet,
                 }
             }))

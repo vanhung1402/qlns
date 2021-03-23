@@ -6,6 +6,7 @@ import moment from 'moment'
 import { dateFilter } from 'vue-date-fns'
 import { required, minValue } from 'vuelidate/lib/validators'
 import Multiselect from 'vue-multiselect'
+import LaborContractList from '@components/nhan-vien/LaborContractList'
 
 export default {
   page: {
@@ -19,6 +20,7 @@ export default {
     Layout,
     PageHeader,
     Multiselect,
+    LaborContractList,
   },
   data() {
     return {
@@ -48,6 +50,7 @@ export default {
       listContractTerm: [],
       listWorkProcess: [],
       listSignedBy: [],
+      listLaborContract: [],
       profile: {},
       datePicker: {
         enableTime: false,
@@ -74,6 +77,7 @@ export default {
   created() {
     this.loadListLaborContractType()
     this.loadListContractTerm()
+    this.loadListContract()
     this.loadProfile()
     this.loadWorkProcess()
     this.loadListSignedBy()
@@ -151,12 +155,25 @@ export default {
         this.listContractTerm = promise.data
       }
     },
+    async loadListContract() {
+      let promise = await this.$staff
+        .get('/nhan-vien/hop-dong?id=' + this.$router.currentRoute.params.profileId)
+        .catch((err) => {
+          console.error(err)
+        })
+      if (promise.status === 200) {
+        console.log(promise.data)
+        this.listLaborContract = promise.data.filter(lb => {
+          return lb.FK_iQuatrinhLamviecID.FK_iNhanvienID === this.$router.currentRoute.params.profileId
+        })
+      }
+    },
     loadListSignedBy() {
       this.$recruitment
         .get('/api/nhan-vien/list-signed-by')
         .then((res) => {
           let listSignedBy = res.data.map((staff) => {
-            staff.selectTitle = staff.sHoten + ' - ' + staff.chucVu
+            staff.selectTitle = staff.sHoten
             return staff
           })
           this.listSignedBy = listSignedBy
@@ -182,9 +199,35 @@ export default {
         this.handleAddNew()
       }
     },
-    handleAddNew() {
+    getNewLaborContract() {
       let newLaborContract = { ...this.form }
-      console.log(newLaborContract)
+      newLaborContract.FK_iNguoiKyID = newLaborContract.FK_iNguoiKyID.PK_iNhanvienID
+      if (!this.isValidDate(newLaborContract.dNgayCoHieuluc)) {
+        newLaborContract.dNgayCoHieuluc = new Date(
+          this.convertDate(newLaborContract.dNgayCoHieuluc)
+        )
+      }
+      if (!this.isValidDate(newLaborContract.dNgayHetHan)) {
+        newLaborContract.dNgayHetHan = new Date(
+          this.convertDate(newLaborContract.dNgayHetHan)
+        )
+      }
+      return newLaborContract
+    },
+    handleAddNew() {
+      let newLaborContract = this.getNewLaborContract()
+      newLaborContract.FK_iNguoiLapID = this.$store.state.auth.currentUser.staff
+      newLaborContract.PK_iHopdongLaodongID = Date.now()
+
+      this.$staff
+        .post('/nhan-vien/hop-dong', { newLaborContract })
+        .then((res) => {
+          console.log(res)
+          this.loadListContract()
+        })
+        .catch((err) => {
+          console.error(err)
+        })
     },
     handleResetForm() {
       this.form = {
@@ -240,8 +283,9 @@ export default {
           break
         }
         case 'year': {
-          ngayHetHan.setYear(
-            ngayHetHan.getYear() + this.form.FK_iThoihanHopdongID.iGiatriThoihan
+          ngayHetHan.setFullYear(
+            ngayHetHan.getFullYear() +
+              this.form.FK_iThoihanHopdongID.iGiatriThoihan
           )
           break
         }
@@ -249,7 +293,6 @@ export default {
           break
       }
       ngayHetHan.setDate(ngayHetHan.getDate() - 1)
-      console.log(this.$refs.ngay_het_han)
       this.form.dNgayHetHan = ngayHetHan
     },
   },
@@ -568,6 +611,7 @@ export default {
         </form>
       </div>
     </div>
+    <LaborContractList :list-labor-contract="listLaborContract" />
   </Layout>
 </template>
 <style>

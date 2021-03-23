@@ -68,7 +68,7 @@ exports.getListPlanWithStatus = async (request, response) => {
             let formatListPlan = doc.reduce((filtered, plan) => {
                 if (plan.FK_iTrangthaiKehoachTuyendungID) {
                     const planFormat = JSON.parse(JSON.stringify(plan))
-                    planFormat.txtThoigianLap = dateFormat(plan.tThoigianLapKehoach, 'dd/MM/yyyy H:m:i')
+                    planFormat.txtThoigianLap = dateFormat(plan.tThoigianLapKehoach.setHours(plan.tThoigianLapKehoach.getHours() + 7), 'dd/MM/yyyy H:m:i')
                     filtered.push(planFormat)
                 }
                 return filtered
@@ -90,7 +90,7 @@ exports.getListPlan = async (request, response) => {
                 response.send(err)
             let formatListPlan = doc.map(plan => {
                 const planFormat = JSON.parse(JSON.stringify(plan))
-                planFormat.txtThoigianLap = dateFormat(plan.tThoigianLapKehoach, 'dd/MM/yyyy HH:mm:ii')
+                planFormat.txtThoigianLap = dateFormat(plan.tThoigianLapKehoach.setHours(plan.tThoigianLapKehoach.getHours() + 7), 'dd/MM/yyyy HH:mm:ii')
                 return planFormat
             })
             response.json(formatListPlan)
@@ -204,9 +204,9 @@ exports.getPlanInfo = (request, response) => {
         .exec((err, doc) => {
             if (err) throw err
             const planFormat = JSON.parse(JSON.stringify(doc))
-            planFormat.txtThoigianLap = dateFormat(doc.tThoigianLapKehoach, 'dd/MM/yyyy HH:mm:i')
+            planFormat.txtThoigianLap = dateFormat(doc.tThoigianLapKehoach.setHours(doc.tThoigianLapKehoach.getHours() + 7), 'dd/MM/yyyy HH:mm:i')
             if (doc.tThoigianDuyetKehoach) {
-                planFormat.txtThoigianDuyet = dateFormat(doc.tThoigianDuyetKehoach, 'dd/MM/yyyy HH:mm:i')
+                planFormat.txtThoigianDuyet = dateFormat(doc.tThoigianDuyetKehoach.setHours(doc.tThoigianDuyetKehoach.getHours() + 7), 'dd/MM/yyyy HH:mm:i')
             }
             response.json(planFormat)
         })

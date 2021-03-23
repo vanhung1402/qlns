@@ -78,7 +78,10 @@ export default {
         })
 
       if (promise.status === 200) {
-        this.recruitmentPlanDetails = promise.data.map((detail) => {
+        console.log()
+        this.recruitmentPlanDetails = promise.data.filter(rpd => {
+          return rpd.FK_iKehoachTuyendungID.FK_iTrangthaiKehoachTuyendungID === '60380c150e583f2e7036ab28'
+        }).map((detail) => {
           detail.titleSelect = `${detail.FK_iVitriCongviecID.sTenVitriCongviec} - ${detail.FK_iKehoachTuyendungID.sTieudeKehoach}`
           return detail
         })

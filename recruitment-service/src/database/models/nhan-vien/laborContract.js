@@ -17,7 +17,6 @@ const tbl_hopdong_laodongSchema = mongoose.Schema({
         type: String,
         required: true,
     },
-    FK_iNhanvienID: { type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true },
     FK_iLoaiHopdongID: { type: Schema.Types.ObjectId, ref: 'dm_loaihopdong', required: true },
     FK_iThoihanHopdongID: { type: Schema.Types.ObjectId, ref: 'dm_thoihan_hopdong' },
     dNgayKy: {

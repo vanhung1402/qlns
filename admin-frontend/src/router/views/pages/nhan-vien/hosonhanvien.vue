@@ -71,6 +71,7 @@ export default {
         FK_iVitriCongviecID: null,
         dNgayBatdau: '',
         dNgayKethuc: '',
+        sGhichu: '',
       },
       profileUpdateId: 0,
     }
@@ -88,11 +89,10 @@ export default {
         .then((res) => {
           if (res.status === 200 && res.data) {
             this.listStaffProfile = res.data.map((profile) => {
-              let pro = profile.thongtin 
-              pro.vitri = this.listJobPosition.find(job => {
-                return (profile.quatrinhlamviec && job._id === profile.quatrinhlamviec.FK_iVitriCongviecID)
+              profile.vitri = this.listJobPosition.find(job => {
+                return (profile.congViecHienTai && job._id === profile.congViecHienTai.FK_iVitriCongviecID)
               })
-              return pro
+              return profile
             })
           }
         })
@@ -269,6 +269,7 @@ export default {
       return false
     },
     handleResetForm() {
+      this.loadListStaffProfile()
       this.formStaff = {
         sMaNhanvien: '',
         sHoten: '',
@@ -765,6 +766,10 @@ export default {
                   class="invalid-feedback"
                   >Ngày kết thúc công việc không hợp lệ</div
                 >
+              </div>
+              <div class="col-md-12 form-group">
+                <label for="ghi-chu">Ghi chú công viêc</label>
+                <input id="ghi-chu" v-model="formWorkProcess.sGhichu" type="text" class="form-control" placeholder="VD: Thăng cấp, chuyển bộ phận...">
               </div>
             </div>
           </div>

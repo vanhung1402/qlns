@@ -43,14 +43,26 @@ export default {
 	created() {
 		this.profileId = this.$router.currentRoute.params.profileId
 		this.loadWorkProcess()
+		this.loadListContract()
 	},
 	methods: {
+    async loadListContract() {
+      let promise = await this.$staff
+        .get('/nhan-vien/hop-dong?id=' + this.$router.currentRoute.params.profileId)
+        .catch((err) => {
+          console.error(err)
+        })
+      if (promise.status === 200) {
+        this.listLaborContract = promise.data.filter(lb => {
+          return lb.FK_iQuatrinhLamviecID.FK_iNhanvienID === this.$router.currentRoute.params.profileId
+        })
+      }
+    },
 		async loadWorkProcess(){
 			this.$staff
         .get('/nhan-vien/qua-trinh-lam-viec?nhan-vien=' + this.profileId)
         .then((res) => {
           if (res.status === 200 && res.data) {
-            console.log(res.data)
             this.listWorkProcess = res.data
           }
         })
@@ -71,6 +83,6 @@ export default {
 			</div>
     </div>
     <StaffWorkProcessList :list-work-process="listWorkProcess" />
-    <LaborContractList :list-labor-contract="listLaborContract" />
+    <LaborContractList :list-labor-contract="listLaborContract" :is-show-add-btn="true" />
   </Layout>
 </template>

@@ -333,7 +333,7 @@ export default {
         </div>
       </div>
 
-      <div class="col-md-5">
+      <div v-if="false" class="col-md-5">
         <div class="row">
           <div v-for="item of statProgress" :key="item.title" class="col-md-12">
             <StatProgress

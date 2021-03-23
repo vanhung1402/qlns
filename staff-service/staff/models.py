@@ -7,6 +7,7 @@ import json
 import sys
 import base64
 import time
+import numpy as np
 
 
 class CustomJSONEncoder(JSONEncoder):
@@ -21,52 +22,85 @@ class Staff:
     }
 
   def getList(self):
-    pipeline = [
-      {
-        u"$project": {
-          u"_id": 0,
-          u"thongtin": u"$$ROOT"
-        }
-      }, 
-      {
-        u"$lookup": {
-          u"localField": u"thongtin._id",
-          u"from": u"tbl_quatrinh_lamviec",
-          u"foreignField": u"FK_iNhanvienID",
-          u"as": u"quatrinhlamviec"
-        }
-      }, 
-      {
-        u"$unwind": {
-          u"path": u"$quatrinhlamviec",
-          u"preserveNullAndEmptyArrays": True
-        }
-      }, 
-      {
-        u"$lookup": {
-          u"localField": u"quatrinhlamviec.FK_iVitriCongviecID",
-          u"from": u"tbl_vitri_congviec",
-          u"foreignField": u"_id",
-          u"as": u"vitri"
-        }
-      }, 
-      {
-        u"$unwind": {
-          u"path": u"$vitri",
-          u"preserveNullAndEmptyArrays": True
-        }
-      }
-    ]
+    # pipeline = [
+    #   {
+    #     "$project": {
+    #       "_id": 0,
+    #       "thongtin": "$$ROOT"
+    #     }
+    #   }, 
+    #   {
+    #     "$lookup": {
+    #       "localField": "thongtin._id",
+    #       "from": "tbl_quatrinh_lamviec",
+    #       "foreignField": "FK_iNhanvienID",
+    #       "as": "quatrinhlamviec"
+    #     }
+    #   }, 
+    #   {
+    #     "$unwind": {
+    #       "path": "$quatrinhlamviec",
+    #       "preserveNullAndEmptyArrays": True
+    #     }
+    #   }, 
+    #   {
+    #     "$lookup": {
+    #       "localField": "quatrinhlamviec.FK_iVitriCongviecID",
+    #       "from": "tbl_vitri_congviec",
+    #       "foreignField": "_id",
+    #       "as": "vitri"
+    #     }
+    #   }, 
+    #   {
+    #     "$unwind": {
+    #       "path": "$vitri",
+    #       "preserveNullAndEmptyArrays": True
+    #     }
+    #   }
+    # ]
+    staff_filter = {}
     try:
-      _staffs = app.db.tbl_nhanvien.aggregate(
-        pipeline, 
-        allowDiskUse = True
-      )
-      staffs = [staff for staff in _staffs]
+      # _staffs = app.db.tbl_nhanvien.aggregate(
+      #   pipeline, 
+      #   allowDiskUse = True
+      # )
+      _staffs = app.db.tbl_nhanvien.find(staff_filter)
+      arrayStaffId = []
+      staffs = []
+      for staff in _staffs:
+        staffs.append(staff)
+        arrayStaffId.append(staff['_id'])
+
+      query = {}
+      query["FK_iNhanvienID"] = { "$in": arrayStaffId }
+      _work_processes = app.db.tbl_quatrinh_lamviec.find(query)
+      map_work_process = {}
+
+      for work_process in _work_processes:
+        if str(work_process['FK_iNhanvienID']) not in map_work_process.keys():
+          map_work_process[str(work_process['FK_iNhanvienID'])] = []
+        map_work_process[str(work_process['FK_iNhanvienID'])].append(work_process)
+
+      formatStaffs = []
+      for staff in staffs:
+        staff['quaTrinhLamViec'] = []
+        if str(staff['_id']) in map_work_process.keys():
+          staff['quaTrinhLamViec'] = map_work_process[str(staff['_id'])].copy()
+          staff['congViecHienTai'] = self.getCurrentWorkProcess(map_work_process[str(staff['_id'])].copy())
+        formatStaffs.append(staff)
+
+      return jsonify(formatStaffs), 200
     except:
       print("Oops!", sys.exc_info(), "occurred.")
       return jsonify(sys.exc_info()), 500
     return jsonify(staffs)
+
+  def getCurrentWorkProcess(self, work_processes):
+    current_work_process = work_processes.pop()
+    for work_process in work_processes:
+      if work_process['dNgayBatdau'] > current_work_process['dNgayBatdau']:
+        current_work_process = work_process
+    return current_work_process
 
   def getStaff(self, iNhanvienID):
     staff = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': iNhanvienID})
@@ -102,6 +136,23 @@ class Staff:
       return jsonify(sys.exc_info()), 500
     return jsonify({"message": "Lỗi không xác định"}), 500
   
+  def addStaffWorkProcess(self):
+    workProcess = json.loads(request.data)
+    createBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': workProcess['FK_iNguoiChuyenID']})
+
+    try:
+      if createBy:
+        workProcess['FK_iNguoiChuyenID'] = createBy['_id']
+        workProcess['FK_iNhanvienID'] = ObjectId(workProcess['FK_iNhanvienID'])
+        result = app.db.tbl_quatrinh_lamviec.save(workProcess)
+        return jsonify(result), 200
+      else:
+          return jsonify({"message": "Người thêm không hợp lệ"}), 500
+    except:
+      print("Oops!", sys.exc_info(), "occurred.")
+      return jsonify(sys.exc_info()), 500
+    return jsonify({"message": "Lỗi không xác định"}), 500
+
   def updateStaff(self):
     data = json.loads(request.data)
     staffUpdateId = request.args.get('id')
@@ -150,3 +201,32 @@ class Staff:
       print("Oops!", sys.exc_info(), "occurred.")
       return jsonify(sys.exc_info()), 500
     return jsonify(profileData)
+
+  def addLaborContract(self):
+    data = json.loads(request.data)
+    laborContract = data['newLaborContract']
+    try:
+      createBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': laborContract['FK_iNguoiLapID']})
+      signedBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': laborContract['FK_iNguoiKyID']})
+
+      if createBy:
+        laborContract['FK_iNguoiLapID'] = createBy['_id']
+        laborContract['FK_iNguoiKyID'] = signedBy['_id']
+        laborContractAdded = app.db.tbl_hopdong_laodong.save(laborContract)
+        return jsonify(laborContractAdded), 200
+      else:
+        return jsonify({"message": "Người thêm không hợp lệ"}), 500
+    except:
+      print("Oops!", sys.exc_info(), "occurred.")
+      return jsonify(sys.exc_info()), 500
+    return jsonify({"message": "Lỗi không xác định"}), 500
+  
+  def getListLaborContract(self):
+    profileId = request.args.get('id')
+    try:
+      _labor_contracts = app.db.tbl_hopdong_laodong.find()
+      labor_contracts = [labor_contract for labor_contract in _labor_contracts]
+    except:
+      print("Oops!", sys.exc_info(), "occurred.")
+      return jsonify(sys.exc_info()), 500
+    return jsonify(labor_contracts)

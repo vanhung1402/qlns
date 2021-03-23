@@ -64,8 +64,8 @@ exports.listPost = (request, response) => {
             if (err) throw err
             response.json(doc.map(post => {
                 const postFormat = JSON.parse(JSON.stringify(post))
-                postFormat.txtThoigianDang = dateFormat(post.tThoigianDang, 'dd/MM/yyyy HH:mm')
-                postFormat.txtThoigianHethan = dateFormat(post.tThoigianHethan, 'dd/MM/yyyy HH:mm')
+                postFormat.txtThoigianDang = dateFormat(post.tThoigianDang.setHours(post.tThoigianDang.getHours() + 7), 'dd/MM/yyyy HH:mm')
+                postFormat.txtThoigianHethan = dateFormat(post.tThoigianHethan.setHours(post.tThoigianHethan.getHours() + 7), 'dd/MM/yyyy HH:mm')
                 return postFormat
             }))
         })
