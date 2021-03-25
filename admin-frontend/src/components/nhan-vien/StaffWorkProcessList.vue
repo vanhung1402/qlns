@@ -17,6 +17,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    isShowBtnAdd: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -54,7 +58,13 @@ export default {
           console.error(err)
         })
     },
-    handleBtnAddLaborContractClick() {},
+    handleBtnAddLaborContractClick(data) {
+      let routeData = this.$router.resolve({
+        name: 'LaborContractWorkProcess',
+        params: { profileId: data.FK_iNhanvienID, workProcessId: data._id },
+      })
+      window.open(routeData.href, '_blank')
+    },
     handleBtnEndLaborContractClick(workProcess) {
       let dNgayBatdau = new Date(workProcess.dNgayBatdau)
       this.dNgayKethucConfig.minDate = dNgayBatdau.setDate(
@@ -198,7 +208,7 @@ export default {
             </tr>
           </tbody>
           <tfoot>
-            <tr>
+            <tr v-if="isShowBtnAdd">
               <th colspan="6" class="text-right">
                 <btnTooltip
                   :btn-id="'btn-add-work-process-'"

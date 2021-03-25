@@ -44,6 +44,7 @@ export default {
       iconBtnSubmit: 'plus',
       isUpdate: false,
       isDisabledThoihan: false,
+      isDisabledQuaTrinh: false,
       submitted: false,
       listJobPosition: {},
       listLaborContractType: [],
@@ -53,6 +54,16 @@ export default {
       listLaborContract: [],
       profile: {},
       datePicker: {
+        enableTime: false,
+        dateFormat: 'd/m/Y',
+        minDate: new Date(),
+      },
+      dNgayCoHieulucConfig: {
+        enableTime: false,
+        dateFormat: 'd/m/Y',
+        minDate: new Date(),
+      },
+      dNgayHethanConfig: {
         enableTime: false,
         dateFormat: 'd/m/Y',
         minDate: new Date(),
@@ -112,7 +123,14 @@ export default {
                   ? ' - ' +
                     moment(String(work.dNgayKethuc)).format('DD/MM/YYYY')
                   : '')
-
+              if (
+                this.$router.currentRoute.params.workProcessId &&
+                this.$router.currentRoute.params.workProcessId === work._id
+              ) {
+                this.form.FK_iQuatrinhLamviecID = work
+                this.isDisabledQuaTrinh = true
+                this.onChangeWorkProcess()
+              }
               return work
             })
           }
@@ -157,14 +175,18 @@ export default {
     },
     async loadListContract() {
       let promise = await this.$staff
-        .get('/nhan-vien/hop-dong?id=' + this.$router.currentRoute.params.profileId)
+        .get(
+          '/nhan-vien/hop-dong?id=' + this.$router.currentRoute.params.profileId
+        )
         .catch((err) => {
           console.error(err)
         })
       if (promise.status === 200) {
         console.log(promise.data)
-        this.listLaborContract = promise.data.filter(lb => {
-          return lb.FK_iQuatrinhLamviecID.FK_iNhanvienID === this.$router.currentRoute.params.profileId
+        this.listLaborContract = promise.data.filter((lb) => {
+          return (
+            lb.qt.FK_iNhanvienID === this.$router.currentRoute.params.profileId
+          )
         })
       }
     },
@@ -201,7 +223,17 @@ export default {
     },
     getNewLaborContract() {
       let newLaborContract = { ...this.form }
-      newLaborContract.FK_iNguoiKyID = newLaborContract.FK_iNguoiKyID.PK_iNhanvienID
+      newLaborContract.FK_iNguoiKyID =
+        newLaborContract.FK_iNguoiKyID.PK_iNhanvienID
+      newLaborContract.FK_iLoaiHopdongID =
+        newLaborContract.FK_iLoaiHopdongID._id
+      if (newLaborContract.FK_iThoihanHopdongID) {
+        newLaborContract.FK_iThoihanHopdongID =
+          newLaborContract.FK_iThoihanHopdongID._id
+      }
+      newLaborContract.FK_iQuatrinhLamviecID =
+        newLaborContract.FK_iQuatrinhLamviecID._id
+
       if (!this.isValidDate(newLaborContract.dNgayCoHieuluc)) {
         newLaborContract.dNgayCoHieuluc = new Date(
           this.convertDate(newLaborContract.dNgayCoHieuluc)
@@ -267,6 +299,8 @@ export default {
       return date instanceof Date && !isNaN(date)
     },
     onChangeContractTerm() {
+      this.dNgayHethanConfig.minDate = this.form.dNgayCoHieuluc
+
       if (!this.form.FK_iThoihanHopdongID) return false
       let ngayCoHieuLuc = new Date(
         this.isValidDate(this.form.dNgayCoHieuluc)
@@ -294,6 +328,18 @@ export default {
       }
       ngayHetHan.setDate(ngayHetHan.getDate() - 1)
       this.form.dNgayHetHan = ngayHetHan
+      this.dNgayHethanConfig.minDate = this.form.dNgayCoHieuluc
+      this.dNgayHethanConfig.minDate.setDate(this.dNgayHethanConfig.minDate.getDate() + 1)
+      console.log(this.dNgayHethanConfig)
+    },
+    onChangeWorkProcess() {
+      if (this.form.FK_iQuatrinhLamviecID) {
+        let ngayCoHieuLuc = new Date(
+          this.form.FK_iQuatrinhLamviecID.dNgayBatdau
+        )
+        this.dNgayCoHieulucConfig.minDate = ngayCoHieuLuc
+        this.form.dNgayCoHieuluc = ngayCoHieuLuc
+      }
     },
   },
   validations: {
@@ -443,7 +489,7 @@ export default {
               <flat-pickr
                 id="ngay-co-hieu-luc"
                 v-model="form.dNgayCoHieuluc"
-                :config="datePicker"
+                :config="dNgayCoHieulucConfig"
                 class="form-control"
                 placeholder="Chọn thời gian"
                 :class="{
@@ -463,7 +509,7 @@ export default {
                 id="ngay-het-han"
                 ref="ngay_het_han"
                 v-model="form.dNgayHetHan"
-                :config="datePicker"
+                :config="dNgayHethanConfig"
                 :disabled="isDisabledThoihan"
                 class="form-control"
                 :placeholder="
@@ -497,6 +543,8 @@ export default {
                 placeholder="Chọn vị trí công việc"
                 :show-labels="false"
                 :options="listWorkProcess"
+                :disabled="isDisabledQuaTrinh"
+                @input="onChangeWorkProcess"
               ></multiselect>
               <div
                 class="invalid-feedback"

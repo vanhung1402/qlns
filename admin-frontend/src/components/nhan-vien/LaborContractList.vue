@@ -84,11 +84,11 @@ export default {
               :key="index"
             >
               <td class="text-center">{{ index + 1 }}</td>
-              <td>{{ laborContract.sSoHopdong }}</td>
-              <td>{{ laborContract.sTenHopdong }}</td>
-              <td>{{ getJobPosition(laborContract.FK_iQuatrinhLamviecID.FK_iVitriCongviecID) }}</td>
-              <td>{{ laborContract.dNgayCoHieuluc | momentVNDate }}</td>
-              <td>{{ laborContract.dNgayHetHan | momentVNDate }}</td>
+              <td>{{ laborContract.hd.sSoHopdong }}</td>
+              <td>{{ laborContract.hd.sTenHopdong }}</td>
+              <td>{{ getJobPosition(laborContract.qt.FK_iVitriCongviecID) }}</td>
+              <td>{{ laborContract.hd.dNgayCoHieuluc | momentVNDate }}</td>
+              <td>{{ laborContract.hd.dNgayHetHan ? (laborContract.hd.dNgayHetHan | momentVNDate) : '' }}</td>
               <td class="text-right">
                 <btnTooltip
                   :btn-id="'btn-labor-contract-info-' + index"

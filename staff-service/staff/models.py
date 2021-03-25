@@ -144,6 +144,8 @@ class Staff:
       if createBy:
         workProcess['FK_iNguoiChuyenID'] = createBy['_id']
         workProcess['FK_iNhanvienID'] = ObjectId(workProcess['FK_iNhanvienID'])
+        workProcess['FK_iVitriCongviecID'] = ObjectId(workProcess['FK_iVitriCongviecID'])
+        
         result = app.db.tbl_quatrinh_lamviec.save(workProcess)
         return jsonify(result), 200
       else:
@@ -212,6 +214,11 @@ class Staff:
       if createBy:
         laborContract['FK_iNguoiLapID'] = createBy['_id']
         laborContract['FK_iNguoiKyID'] = signedBy['_id']
+        laborContract['FK_iLoaiHopdongID'] = ObjectId(laborContract['FK_iLoaiHopdongID'])
+        laborContract['FK_iQuatrinhLamviecID'] = ObjectId(laborContract['FK_iQuatrinhLamviecID'])
+        if laborContract['FK_iThoihanHopdongID']:
+          laborContract['FK_iThoihanHopdongID'] = ObjectId(laborContract['FK_iThoihanHopdongID'])
+
         laborContractAdded = app.db.tbl_hopdong_laodong.save(laborContract)
         return jsonify(laborContractAdded), 200
       else:
@@ -223,8 +230,34 @@ class Staff:
   
   def getListLaborContract(self):
     profileId = request.args.get('id')
+    pipeline = [
+      {
+        u"$project": {
+          u"_id": 0,
+          u"hd": u"$$ROOT"
+        }
+      }, 
+      {
+        u"$lookup": {
+          u"localField": u"hd.FK_iQuatrinhLamviecID",
+          u"from": u"tbl_quatrinh_lamviec",
+          u"foreignField": u"_id",
+          u"as": u"qt"
+        }
+      }, 
+      {
+        u"$unwind": {
+          u"path": u"$qt",
+          u"preserveNullAndEmptyArrays": False
+        }
+      }
+    ]
+
     try:
-      _labor_contracts = app.db.tbl_hopdong_laodong.find()
+      _labor_contracts = app.db.tbl_hopdong_laodong.aggregate(
+        pipeline, 
+        allowDiskUse = True
+      )
       labor_contracts = [labor_contract for labor_contract in _labor_contracts]
     except:
       print("Oops!", sys.exc_info(), "occurred.")

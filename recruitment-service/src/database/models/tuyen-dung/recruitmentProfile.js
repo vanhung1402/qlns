@@ -29,7 +29,7 @@ const tbl_hoso_tuyendungSchema = mongoose.Schema({
     default: '',
   },
   FK_iNguoiLuuID: {
-    type: Schema.Types.ObjectId, ref: 'tbl_nhanvien', required: true
+    type: Schema.Types.ObjectId, ref: 'tbl_nhanvien'
   },
   tThoigianLuu: {
     type: Date,

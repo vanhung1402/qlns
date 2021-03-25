@@ -103,9 +103,10 @@ exports.getAccount = async ({ username, password }) => {
         id: doc.PK_iTaikhoanID,
         username: doc.sTenTaikhoan,
         name: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.sHoten : '',
-        staff: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.PK_iNhanvienID : '',
+        staff: doc.FK_iNhanvienID ? doc.FK_iNhanvienID._id : '',
         email: doc.FK_iNhanvienID ? doc.FK_iNhanvienID.sEmail : '',
         permissionname: doc.FK_iQuyenID.sTenQuyen,
+        permissionid: doc.FK_iQuyenID.PK_iQuyenID,
         token: `valid-token-for-${doc.sTenTaikhoan}`,
         available: doc.FK_iTrangthaiTaikhoan.PK_iTrangthaiTaikhoanID
     }

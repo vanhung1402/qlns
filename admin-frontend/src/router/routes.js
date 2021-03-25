@@ -390,7 +390,15 @@ const employeeManagement = [
       },
       {
         name: 'LaborContract',
-        path: 'hop-dong-lao-dong/:profileId',
+        path: 'hop-dong-lao-dong/:profileId/',
+        hidden: 1,
+        meta: { title: 'Hợp đồng lao động', authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/nhan-vien/hopdonglaodong')),
+      },
+      {
+        name: 'LaborContractWorkProcess',
+        path: 'hop-dong-lao-dong/:profileId/:workProcessId',
         hidden: 1,
         meta: { title: 'Hợp đồng lao động', authRequired: true },
         component: () =>
