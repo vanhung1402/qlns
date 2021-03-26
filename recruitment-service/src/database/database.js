@@ -8,7 +8,7 @@ class Database {
 	_connect() {
 		mongoose
 			.connect(
-				`${process.env.MONGO_URL}/${process.env.DB_NAME}`,
+				`${process.env.MONGO_SYNC_URL}`,
 				{ 
 					useNewUrlParser: true, 
 					useUnifiedTopology: true, 

@@ -1,11 +1,23 @@
 version: '3.6'
 
 services:
+  mongo_sync:
+    hostname: mongo_sync
+    container_name: localmongo_sync
+    image: mongo:4.0-xenial
+    expose:
+      - 27020
+    ports:
+      - 27020:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+    networks:
+      - qlns_net
   my-mongodb:
     image: mongo:4.2.3-bionic
     container_name: my-mongodb
     ports:
-      - 27018:27017
+      - 27019:27017
     environment:
       - MONGO_INITDB_DATABASE=qlns
       - MONGO_INITDB_ROOT_USERNAME=qlns
@@ -28,6 +40,7 @@ services:
       - ./authenticate-service:/usr/src/authenticate-service
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - MONGO_SYNC_URL=mongodb://mongo_sync:27017/qlns
       - APP_PORT=3002
     ports: 
       - '3002:3000'
@@ -47,6 +60,7 @@ services:
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
       - AUTHENTICATE_API_URL=http://authenticate-service:3000/
+      - MONGO_SYNC_URL=mongodb://mongo_sync:27017/qlns
       - DB_NAME=qlns
       - APP_PORT=3001
     ports: 
@@ -67,6 +81,7 @@ services:
       - ./staff-service:/usr/src/staff-service
     environment:
       - MONGO_URL=mongodb://qlns:admin_qlns@my-mongodb:27017
+      - MONGO_SYNC_URL=mongodb://mongo_sync:27017/qlns
       - DB_NAME=qlns
     ports: 
       - '3003:3000'

@@ -17,7 +17,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    isShowAddBtn: {
+    isShowBtnAdd: {
       type: Boolean,
       default: false
     }
@@ -101,7 +101,7 @@ export default {
               </td>
             </tr>
           </tbody>
-          <tfoot v-if="isShowAddBtn">
+          <tfoot v-if="isShowBtnAdd">
             <tr>
               <th colspan="7" class="text-right">
                 <btnTooltip

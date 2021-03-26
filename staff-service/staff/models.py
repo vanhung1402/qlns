@@ -9,7 +9,6 @@ import base64
 import time
 import numpy as np
 
-
 class CustomJSONEncoder(JSONEncoder):
   def default(self, obj):
     return str(obj)
@@ -120,13 +119,15 @@ class Staff:
         with open(staff['sDuongdanAnhdaidien'], 'wb') as f:
           f.write(avatarData)
 
-      createBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': staff['FK_iNguoithemID']})
+      createBy = ObjectId(staff['FK_iNguoithemID'])
       if createBy:
-        staff['FK_iNguoithemID'] = createBy['_id']
+        staff['FK_iNguoithemID'] = createBy
+        staff['FK_iDantocID'] = ObjectId(staff['FK_iDantocID'])
+        staff['FK_iTongiaoID'] = ObjectId(staff['FK_iTongiaoID'])
         newStaffId = app.db.tbl_nhanvien.save(staff)
         if newStaffId:
           workProcess['FK_iNhanvienID'] = newStaffId
-          workProcess['FK_iNguoiChuyenID'] = createBy['_id']
+          workProcess['FK_iNguoiChuyenID'] = createBy
           app.db.tbl_quatrinh_lamviec.save(workProcess)
         return jsonify(newStaffId), 200
       else:
@@ -138,11 +139,11 @@ class Staff:
   
   def addStaffWorkProcess(self):
     workProcess = json.loads(request.data)
-    createBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': workProcess['FK_iNguoiChuyenID']})
+    createBy = ObjectId(workProcess['FK_iNguoiChuyenID'])
 
     try:
       if createBy:
-        workProcess['FK_iNguoiChuyenID'] = createBy['_id']
+        workProcess['FK_iNguoiChuyenID'] = createBy
         workProcess['FK_iNhanvienID'] = ObjectId(workProcess['FK_iNhanvienID'])
         workProcess['FK_iVitriCongviecID'] = ObjectId(workProcess['FK_iVitriCongviecID'])
         
@@ -169,9 +170,9 @@ class Staff:
         with open(staffUpdateData['sDuongdanAnhdaidien'], 'wb') as f:
           f.write(avatarData)
 
-      updateBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': staffUpdateData['FK_iNguoicapnhatID']})
+      updateBy = ObjectId(staffUpdateData['FK_iNguoicapnhatID'])
       if updateBy:
-        staffUpdateData['FK_iNguoicapnhatID'] = updateBy['_id']
+        staffUpdateData['FK_iNguoicapnhatID'] = updateBy
         updateStaffId = app.db.tbl_nhanvien.update_one({'_id': ObjectId(staffUpdateId)}, {'$set': staffUpdateData})
 
         return jsonify(staffUpdateId), 200
@@ -208,12 +209,12 @@ class Staff:
     data = json.loads(request.data)
     laborContract = data['newLaborContract']
     try:
-      createBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': laborContract['FK_iNguoiLapID']})
-      signedBy = app.db.tbl_nhanvien.find_one({'PK_iNhanvienID': laborContract['FK_iNguoiKyID']})
+      createBy = ObjectId(laborContract['FK_iNguoiLapID'])
+      signedBy = ObjectId(laborContract['FK_iNguoiKyID'])
 
       if createBy:
-        laborContract['FK_iNguoiLapID'] = createBy['_id']
-        laborContract['FK_iNguoiKyID'] = signedBy['_id']
+        laborContract['FK_iNguoiLapID'] = createBy
+        laborContract['FK_iNguoiKyID'] = signedBy
         laborContract['FK_iLoaiHopdongID'] = ObjectId(laborContract['FK_iLoaiHopdongID'])
         laborContract['FK_iQuatrinhLamviecID'] = ObjectId(laborContract['FK_iQuatrinhLamviecID'])
         if laborContract['FK_iThoihanHopdongID']:

@@ -31,6 +31,8 @@ exports.getAuthentication = async (request, response) => {
 	let { username, password } = request.body
 	let matchedUser = await tbl_taikhoan.getAccount({ username, password })
 
+	console.log(matchedUser)
+
 	if (matchedUser) {
 		if (matchedUser.available === 2) {
 			response.status(400).json({ message: 'Tài khoản đã bị khóa, vui lòng liên hệ người quản lý để mở khóa.' })

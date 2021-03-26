@@ -1,10 +1,11 @@
 import tbl_nhanvien from './../../database/models/nhan-vien/staff'
 import tbl_bantin_tuyendung from '../../database/models/tuyen-dung/recruitmentPost'
 import { format as dateFormat } from 'date-fns'
+import { ObjectId } from 'mongodb'
 
 exports.addPost = async (request, response) => {
     const params = request.body
-    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const createBy = ObjectId(params.createBy)
     const newPost = new tbl_bantin_tuyendung({
         PK_iBantinTuyendungID: Date.now(),
         FK_iChitietKehoachTuyendungID: params.recruitmentPlanDetailSelected,
@@ -24,7 +25,7 @@ exports.addPost = async (request, response) => {
 exports.updatePost = async (request, response) => {
     const filter = { _id: request.params.postId }
     const params = request.body
-    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const createBy = ObjectId(params.createBy)
     const updatePost = {
         FK_iChitietKehoachTuyendungID: params.recruitmentPlanDetailSelected,
         sTieudeTinTuyendung: params.titleNews,

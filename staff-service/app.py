@@ -17,7 +17,7 @@ class CustomJSONEncoder(JSONEncoder):
 app = Flask(__name__)
 CORS(app)
 
-client = MongoClient(os.environ['MONGO_URL'])
+client = MongoClient(os.environ['MONGO_SYNC_URL'])
 app.db = client.qlns
 app.json_encoder = CustomJSONEncoder
 

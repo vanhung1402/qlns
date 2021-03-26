@@ -224,7 +224,7 @@ export default {
     getNewLaborContract() {
       let newLaborContract = { ...this.form }
       newLaborContract.FK_iNguoiKyID =
-        newLaborContract.FK_iNguoiKyID.PK_iNhanvienID
+        newLaborContract.FK_iNguoiKyID._id
       newLaborContract.FK_iLoaiHopdongID =
         newLaborContract.FK_iLoaiHopdongID._id
       if (newLaborContract.FK_iThoihanHopdongID) {

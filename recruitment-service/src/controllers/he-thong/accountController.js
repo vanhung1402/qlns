@@ -89,6 +89,10 @@ exports.authenticate = (request, response) => {
 }
 
 exports.getAccount = async ({ username, password }) => {
+    tbl_taikhoan.find((err, doc) => {
+        if (err) throw err
+        console.log(doc)
+    })
     const filter = { sTenTaikhoan: username, sMatkhau: sha256(password) }
     let doc = await tbl_taikhoan
         .findOne(filter)

@@ -1,9 +1,8 @@
 import tbl_mau_quyetdinh_tuyendung from '../../database/models/tuyen-dung/recruitmentDecisionPattern'
 import tbl_quyetdinh_tuyendung from '../../database/models/tuyen-dung/recruitmentDecision'
 import dm_trangthai_quyetdinh_tuyendung from '../../database/models/danh-muc/recruitmentDecisionStatus'
-import tbl_nhanvien from './../../database/models/nhan-vien/staff'
 import { format as dateFormat } from 'date-fns'
-import { response } from 'express'
+import { ObjectId } from 'mongodb'
 
 exports.listDecisionPattern = (request, response) => {
     tbl_mau_quyetdinh_tuyendung
@@ -26,7 +25,7 @@ exports.saveDecisionPattern = (request, response) => {
 
 exports.saveDecision = async (request, response) => {
     let params = request.body
-    const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    const createBy = ObjectId(params.createBy)
     const status = await dm_trangthai_quyetdinh_tuyendung.findOne({ PK_iTrangthaiQuyetdinhTuyendungID: 1 }).exec()
 
     if (createBy) {
@@ -166,7 +165,7 @@ exports.listDecisions = (request, response) => {
 
 exports.updateDecision = async (request, response) => {
     let params = request.body
-    const updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.updateBy }).exec()
+    const updateBy = ObjectId(params.updateBy)
     const filter = { _id: params.decisionUpdateId }
     let update = {
         FK_iNguoiLapQuyetdinhTuyendungID: updateBy,

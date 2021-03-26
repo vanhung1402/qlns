@@ -1,12 +1,12 @@
 import tbl_kehoach_tuyendung from '../../database/models/tuyen-dung/recruitmentPlan'
-import tbl_nhanvien from './../../database/models/nhan-vien/staff'
 import dm_trangthai_kehoach_tuyendung from './../../database/models/danh-muc/recruitmentPlanStatus'
 import tbl_chitiet_kehoach_tuyendung from './../../database/models/tuyen-dung/recruitmentPlanDetail'
 import { format as dateFormat } from 'date-fns'
+import { ObjectId } from 'mongodb'
 
 exports.addPlan = async (request, response) => {
     let params = request.body
-    let createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.createBy }).exec()
+    let createBy = ObjectId(params.createBy)
     let status = await dm_trangthai_kehoach_tuyendung.findOne({ PK_iTrangthaiKehoachTuyendungID: 1 }).exec()
     let newRecruitmentPlan = new tbl_kehoach_tuyendung({
         PK_iKehoachTuyendungID: Date.now(),
@@ -127,7 +127,7 @@ exports.updatePlan = async (request, response) => {
     let planId = request.params.planId
     let { action, params } = request.body
     const filter = { _id: planId }
-    let updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: params.updateBy }).exec()
+    let updateBy = ObjectId(params.updateBy)
     if (!updateBy) {
         return false
     }

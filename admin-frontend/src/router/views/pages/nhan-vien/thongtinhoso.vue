@@ -82,7 +82,7 @@ export default {
 				<hr>
 			</div>
     </div>
-    <StaffWorkProcessList :list-work-process="listWorkProcess" />
-    <LaborContractList :list-labor-contract="listLaborContract" :is-show-add-btn="true" />
+    <StaffWorkProcessList :list-work-process="listWorkProcess" :is-show-btn-add="true" />
+    <LaborContractList :list-labor-contract="listLaborContract" :is-show-btn-add="true" />
   </Layout>
 </template>

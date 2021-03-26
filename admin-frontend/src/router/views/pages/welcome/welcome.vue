@@ -38,5 +38,9 @@ export default {
   components: {
     Layout,
   },
+  created(){
+    console.log(typeof this.$store.state.auth.currentUser.staff)
+    console.log(this.$store.state.auth.currentUser)
+  }
 }
 </script>

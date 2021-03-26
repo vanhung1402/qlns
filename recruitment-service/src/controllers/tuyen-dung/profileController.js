@@ -1,6 +1,6 @@
 import tbl_hoso_tuyendung from '../../database/models/tuyen-dung/recruitmentProfile'
-import tbl_nhanvien from './../../database/models/nhan-vien/staff'
 import dm_trangthai_hoso from '../../database/models/danh-muc/recruitmentProfileStatus'
+import { ObjectId } from 'mongodb'
 
 exports.getList = (request, response) => {
 	let status = request.body.status
@@ -36,7 +36,6 @@ exports.getList = (request, response) => {
 
 exports.getListWithStatus = (request, response) => {
 	let status = request.query.status
-
 
 	tbl_hoso_tuyendung
 		.find()
@@ -74,7 +73,7 @@ exports.getListWithStatus = (request, response) => {
 
 exports.addNew = async (request, response) => {
 	const profileStatus = await dm_trangthai_hoso.findOne({ PK_iTrangthaiHosoTuyendungID: 1 })
-	const createBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: request.body.createBy })
+	const createBy = ObjectId(request.body.createBy)
 
 	const newProfile = new tbl_hoso_tuyendung({
 		PK_iHosoTuyendungID: request.body.profileId,
@@ -114,7 +113,7 @@ exports.delete = (request, response) => {
 
 exports.update = async (request, response) => {
 	const filter = { _id: request.params.profileId }
-	const updateBy = await tbl_nhanvien.findOne({ PK_iNhanvienID: request.body.params.updateBy }).exec()
+	const updateBy = ObjectId(request.body.params.updateBy)
 	let action = request.body.params.action
 	let update = { FK_iNguoiLuuID: updateBy, tThoigianLuu: Date.now() }
 
