@@ -83,12 +83,12 @@ export default {
               v-for="(laborContract, index) in listLaborContract"
               :key="index"
             >
-              <td class="text-center">{{ index + 1 }}</td>
-              <td>{{ laborContract.hd.sSoHopdong }}</td>
+              <td class="text-center">{{ laborContract.hd.sSoHopdong }}</td>
+              <td>{{ laborContract.lhd.sTenLoaiHopdong }}</td>
               <td>{{ laborContract.hd.sTenHopdong }}</td>
               <td>{{ getJobPosition(laborContract.qt.FK_iVitriCongviecID) }}</td>
               <td>{{ laborContract.hd.dNgayCoHieuluc | momentVNDate }}</td>
-              <td>{{ laborContract.hd.dNgayHetHan ? (laborContract.hd.dNgayHetHan | momentVNDate) : '' }}</td>
+              <td><span v-if="laborContract.hd.dNgayHetHan">{{ laborContract.hd.dNgayHetHan | momentVNDate }}</span></td>
               <td class="text-right">
                 <btnTooltip
                   :btn-id="'btn-labor-contract-info-' + index"

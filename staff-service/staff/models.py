@@ -245,13 +245,27 @@ class Staff:
           u"foreignField": u"_id",
           u"as": u"qt"
         }
-      }, 
+      },
       {
         u"$unwind": {
           u"path": u"$qt",
           u"preserveNullAndEmptyArrays": False
         }
-      }
+      },
+      {
+        u"$lookup": {
+          u"localField": u"hd.FK_iLoaiHopdongID",
+          u"from": u"dm_loaihopdong",
+          u"foreignField": u"_id",
+          u"as": u"lhd"
+        }
+      },
+      {
+        u"$unwind": {
+          u"path": u"$lhd",
+          u"preserveNullAndEmptyArrays": False
+        }
+      },
     ]
 
     try:

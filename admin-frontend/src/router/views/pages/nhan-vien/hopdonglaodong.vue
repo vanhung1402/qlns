@@ -57,16 +57,19 @@ export default {
         enableTime: false,
         dateFormat: 'd/m/Y',
         minDate: new Date(),
+        maxDate: null,
       },
       dNgayCoHieulucConfig: {
         enableTime: false,
         dateFormat: 'd/m/Y',
         minDate: new Date(),
+        maxDate: null,
       },
       dNgayHethanConfig: {
         enableTime: false,
         dateFormat: 'd/m/Y',
         minDate: new Date(),
+        maxDate: null,
       },
       form: {
         sTenHopdong: '',
@@ -339,6 +342,15 @@ export default {
         )
         this.dNgayCoHieulucConfig.minDate = ngayCoHieuLuc
         this.form.dNgayCoHieuluc = ngayCoHieuLuc
+
+        if (this.form.FK_iQuatrinhLamviecID.dNgayKethuc){
+          let ngayHetHan = new Date(
+            this.form.FK_iQuatrinhLamviecID.dNgayKethuc
+          )
+          this.dNgayCoHieulucConfig.maxDate = ngayHetHan
+          this.dNgayHethanConfig.maxDate = ngayHetHan
+          this.form.dNgayHetHan = ngayHetHan
+        }
       }
     },
   },

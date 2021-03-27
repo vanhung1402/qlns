@@ -13,21 +13,21 @@ services:
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
     networks:
       - qlns_net
-  my-mongodb:
-    image: mongo:4.2.3-bionic
-    container_name: my-mongodb
-    ports:
-      - 27019:27017
-    environment:
-      - MONGO_INITDB_DATABASE=qlns
-      - MONGO_INITDB_ROOT_USERNAME=qlns
-      - MONGO_INITDB_ROOT_PASSWORD=admin_qlns
-    volumes:
-      - ./mongo-db/mongo-entrypoint:/docker-entrypoint-initdb.d
-      - ./mongo-db/mongodb:/data/db
-      - ./mongo-db/mongoconfig:/data/configdb
-    networks:
-      - qlns_net
+  # my-mongodb:
+  #   image: mongo:4.2.3-bionic
+  #   container_name: my-mongodb
+  #   ports:
+  #     - 27019:27017
+  #   environment:
+  #     - MONGO_INITDB_DATABASE=qlns
+  #     - MONGO_INITDB_ROOT_USERNAME=qlns
+  #     - MONGO_INITDB_ROOT_PASSWORD=admin_qlns
+  #   volumes:
+  #     - ./mongo-db/mongo-entrypoint:/docker-entrypoint-initdb.d
+  #     - ./mongo-db/mongodb:/data/db
+  #     - ./mongo-db/mongoconfig:/data/configdb
+  #   networks:
+  #     - qlns_net
 
   authenticate-service:
     container_name: authenticate-service
@@ -88,6 +88,8 @@ services:
     networks:
       - qlns_net
 
+  
+
   admin-frontend:
     container_name: admin-frontend
     build: 
@@ -108,6 +110,7 @@ services:
       - '8080:8080'
     networks:
       - qlns_net
+
 volumes:
   mongodb:
   mongoconfig:
