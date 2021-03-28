@@ -7,7 +7,10 @@ exports.getSession = async (request, response) => {
 		let promise = await axios.get(
 			process.env.AUTHENTICATE_API_URL + 'api/authentication/profile?token=' + request.headers.authorization,
 		)
-
+		.catch(err => {
+			console.log(err)
+		})
+		
 		if (promise && promise.status === 200 && promise.data) {
 			let currentUser = promise.data
 			currentUser.token = request.headers.authorization

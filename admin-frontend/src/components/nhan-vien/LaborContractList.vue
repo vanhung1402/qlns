@@ -83,7 +83,7 @@ export default {
               v-for="(laborContract, index) in listLaborContract"
               :key="index"
             >
-              <td class="text-center">{{ laborContract.hd.sSoHopdong }}</td>
+              <td>{{ laborContract.hd.sSoHopdong }}</td>
               <td>{{ laborContract.lhd.sTenLoaiHopdong }}</td>
               <td>{{ laborContract.hd.sTenHopdong }}</td>
               <td>{{ getJobPosition(laborContract.qt.FK_iVitriCongviecID) }}</td>

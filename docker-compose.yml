@@ -34,7 +34,7 @@ services:
     build: 
       context: ./authenticate-service
     depends_on:
-      - my-mongodb
+      - mongo_sync
     restart: always
     volumes:
       - ./authenticate-service:/usr/src/authenticate-service
@@ -52,7 +52,7 @@ services:
     build: 
       context: ./recruitment-service
     depends_on:
-      - my-mongodb
+      - mongo_sync
       - authenticate-service
     restart: always
     volumes:
@@ -74,7 +74,7 @@ services:
     build: 
       context: ./staff-service
     depends_on:
-      - my-mongodb
+      - mongo_sync
       - authenticate-service
     restart: always
     volumes:
@@ -88,7 +88,29 @@ services:
     networks:
       - qlns_net
 
-  
+  # mysql_sync:
+  #   image: mysql:5.7
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: my_secret_pw_shh
+  #     MYSQL_DATABASE: test_db
+  #     MYSQL_USER: devuser
+  #     MYSQL_PASSWORD: devpass
+  #   ports:
+  #     - "9906:3306"
+  # workflow-service:
+  #   image: php:7.2.2-apache
+  #   container_name: workflow-service
+  #   depends_on:
+  #     # - mysql_sync
+  #     - authenticate-service
+  #   volumes:
+  #     - ./workflow-services/:/var/www/html/
+  #   ports:
+  #     - "8100:80"
+  #   stdin_open: true
+  #   tty: true
+  #   networks:
+  #     - qlns_net
 
   admin-frontend:
     container_name: admin-frontend

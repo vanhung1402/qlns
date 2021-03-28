@@ -1,4 +1,3 @@
-/* eslint-disable vue/no-v-html */
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'

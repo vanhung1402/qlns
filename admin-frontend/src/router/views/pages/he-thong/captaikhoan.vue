@@ -41,17 +41,15 @@ export default {
         employee: '',
         username: '',
         permission: '',
-        password: '',
-        confirmPassword: '',
+        password: '111111',
+        confirmPassword: '111111',
       },
       submitted: false,
-      listPermission: [
-        { sTenQuyen: 'Nhân viên', PK_iQuyenID: '1' },
-        { sTenQuyen: 'Kế toán', PK_iQuyenID: '2' },
-        { sTenQuyen: 'Hành chính', PK_iQuyenID: '3' },
-      ],
+      listPermission: [],
       listAccountStatus: [],
       listStaff: [],
+      listStaffProfile: [],
+      listJobPosition: [],
       statProgress: [
         {
           title: 'Số tài khoản đã cấp',
@@ -80,9 +78,9 @@ export default {
     },
   },
   created() {
-    this.loadListStaff()
     this.loadListPermission()
     this.loadListAccountStatus()
+    this.loadJobPosition()
   },
   methods: {
     loadListAccountStatus(){
@@ -100,6 +98,7 @@ export default {
         .get('/api/danh-muc/list-permission', {})
         .then((res) => {
           this.listPermission = res.data
+          this.loadListStaffProfile()
         })
         .catch((err) => {
           console.error('Error: ', err)
@@ -117,6 +116,34 @@ export default {
         })
         .catch((err) => {
           console.error('Error: ', err)
+        })
+    },
+    async loadJobPosition() {
+      let promise = await this.$recruitment
+        .get('/api/cau-hinh/list-job-position')
+        .catch((err) => {
+          console.error(err)
+        })
+      if (promise.status === 200) {
+        this.listJobPosition = promise.data
+      }
+    },
+    loadListStaffProfile() {
+      this.$staff
+        .get('/nhan-vien/danh-sach')
+        .then((res) => {
+          if (res.status === 200 && res.data) {
+            this.listStaffProfile = res.data.map((profile) => {
+              profile.vitri = this.listJobPosition.find(job => {
+                return (profile.congViecHienTai && job._id === profile.congViecHienTai.FK_iVitriCongviecID)
+              })
+              profile.selectTitle = profile.sHoten + ' - ' + (profile.vitri ? profile.vitri.sTenVitriCongviec : 'Không xác định')
+              return profile
+            })
+          }
+        })
+        .catch((err) => {
+          console.error(err)
         })
     },
     handleSubmit(e) {
@@ -179,13 +206,13 @@ export default {
                       v-model="form.employee"
                       name="employee"
                       label="selectTitle"
-                      track-by="PK_iNhanvienID"
+                      track-by="_id"
                       placeholder="Chọn nhân viên"
                       :show-labels="false"
                       :class="{
                         'is-invalid': submitted && $v.form.employee.$error,
                       }"
-                      :options="listStaff"
+                      :options="listStaffProfile"
                     ></multiselect>
                     <div
                       v-if="submitted && !$v.form.employee.required"

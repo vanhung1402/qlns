@@ -4,6 +4,7 @@ module.exports = {
         'PK_iNguoithemID',
         'FK_iDantocID',
         'FK_iTongiaoID',
+        'FK_iNguoicapnhatID',
         'sMasothue',
         'sTrinhdoVanhoa',
         'sMotaBanthan',

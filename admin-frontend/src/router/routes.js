@@ -436,6 +436,54 @@ const employeeManagement = [
   }
 ]
 
+// Quản lý công việc
+const workFlowManagement = [
+  {
+    path: '/cong-viec',
+    name: 'Quản lý công việc',
+    icon: 'trello',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'Công việc của bạn',
+        path: 'cua-ban',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/cong-viec/congvieccuaban')),
+      },
+      {
+        name: 'Phân công công việc',
+        path: 'phan-cong',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/cong-viec/phancongcongviec')),
+      },
+      {
+        name: 'WorkFlow',
+        path: 'chi-tiet/:workFlowId',
+        hidden: 1,
+        meta: { title: 'Thông tin công việc', authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/cong-viec/chitietcongviec')),
+      },
+      {
+        name: 'Tình trạng công việc',
+        path: 'tinh-trang',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/cong-viec/tinhtrangcongviec')),
+      },
+    ]
+  }
+]
+
 // apps
 const calendarAppsRoutes = [
   {
@@ -795,24 +843,6 @@ const quanLyLT = [
   },
 ]
 
-const quanLyCongViec = [
-  {
-    path: '/tables',
-    name: 'Quản lý công việc',
-    icon: 'calendar',
-    meta: { authRequired: true },
-    // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
-    children: [
-      
-    ],
-  },
-]
-
 // charts
 const chartsRoutes = [
   {
@@ -832,9 +862,9 @@ const authProtectedRoutes = [
   ...systemManagement,
   ...recruitmentManagement,
   ...employeeManagement,
+  ...workFlowManagement,
   ...quanLyChamCong,
   ...quanLyLT,
-  ...quanLyCongViec,
   ...dashboardRoutes,
   ...appsRoutes,
   ...pagesRoutes,

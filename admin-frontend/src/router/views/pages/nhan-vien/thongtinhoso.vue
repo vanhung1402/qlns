@@ -54,7 +54,7 @@ export default {
         })
       if (promise.status === 200) {
         this.listLaborContract = promise.data.filter(lb => {
-          return lb.FK_iQuatrinhLamviecID.FK_iNhanvienID === this.$router.currentRoute.params.profileId
+          return lb.qt.FK_iNhanvienID === this.$router.currentRoute.params.profileId
         })
       }
     },

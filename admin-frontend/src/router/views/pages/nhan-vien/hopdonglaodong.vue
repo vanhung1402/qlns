@@ -73,7 +73,7 @@ export default {
       },
       form: {
         sTenHopdong: '',
-        sSoHopdong: '',
+        sSoHopdong: 'HĐ' + Date.now(),
         FK_iLoaiHopdongID: null,
         FK_iThoihanHopdongID: null,
         dNgayKy: new Date(),
@@ -267,7 +267,7 @@ export default {
     handleResetForm() {
       this.form = {
         sTenHopdong: '',
-        sSoHopdong: '',
+        sSoHopdong: 'HĐ' + Date.now(),
         FK_iLoaiHopdongID: null,
         FK_iThoihanHopdongID: null,
         dNgayKy: new Date(),

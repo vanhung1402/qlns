@@ -34,11 +34,17 @@ const staffApi = axios.create({
   baseURL: process.env.STAFF_API_URL ? process.env.STAFF_API_URL : 'http://localhost:3003/',
 })
 
+const workFlowApi = axios.create({
+  baseURL: process.env.STAFF_API_URL ? process.env.STAFF_API_URL : 'http://localhost/workflow-services/',
+})
+
 window.toastr = require('toastr')
 
 Vue.prototype.$recruitment = recruitmentApi
 Vue.prototype.$authenticate = authenticateApi
 Vue.prototype.$staff = staffApi
+Vue.prototype.$workflow = workFlowApi
+
 Vue.use(VueToastr2)
 Vue.use(VueSweetalert2)
 Vue.use(DisableAutocomplete)
