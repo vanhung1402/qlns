@@ -1,4 +1,4 @@
-FROM node:latest
+FROM public.ecr.aws/docker/library/node:lts
 RUN mkdir -p /usr/src/admin-frontend/
 WORKDIR /usr/src/admin-frontend/
 COPY package*.json /usr/src/admin-frontend/
