@@ -1,4 +1,4 @@
-FROM node:latest
+FROM public.ecr.aws/docker/library/node:lts
 RUN mkdir -p /usr/src/authenticate-service/
 WORKDIR /usr/src/authenticate-service/
 COPY package.json /usr/src/authenticate-service/
