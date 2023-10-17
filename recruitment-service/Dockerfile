@@ -1,4 +1,4 @@
-FROM  public.ecr.aws/docker/library/node:lts
+FROM public.ecr.aws/docker/library/node:lts
 RUN mkdir -p /usr/src/recruitment-service/
 WORKDIR /usr/src/recruitment-service/
 COPY package.json /usr/src/recruitment-service/
